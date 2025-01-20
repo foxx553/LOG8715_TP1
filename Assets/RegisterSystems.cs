@@ -9,6 +9,10 @@ public class RegisterSystems
         // Add your systems here
         var initialization = new Initialization();
         toRegister.Add(initialization);
+        var componentDatabase = initialization.componentDatabase;
+
+        var updatePosition = new UpdatePosition(componentDatabase);
+        toRegister.Add(updatePosition);
 
         return toRegister;
     }
