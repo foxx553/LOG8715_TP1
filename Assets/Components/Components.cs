@@ -6,7 +6,12 @@ public class PositionComponent : IComponent{
 public class VelocityComponent : IComponent{
     public Vector2 Velocity {get; set;}
 }
-
 public class SizeComponent : IComponent{
-    public uint Size {get; set;}
+    public int Size {get; set;}
+}
+public class CollisionComponent : IComponent{
+    public uint? Id {get; set;}
+}
+public class CooldownComponent : IComponent{
+    public float DeltaTime {get; set;}
 }

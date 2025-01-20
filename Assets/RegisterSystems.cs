@@ -9,10 +9,15 @@ public class RegisterSystems
         // Add your systems here
         var initialization = new Initialization();
         toRegister.Add(initialization);
-        var componentDatabase = initialization.componentDatabase;
 
+        var componentDatabase = initialization.componentDatabase;
+        var calculatePosition = new CalculatePosition(componentDatabase);
         var updatePosition = new UpdatePosition(componentDatabase);
+        var handleCollision = new HandleCollision(componentDatabase);
+
+        toRegister.Add(calculatePosition);
         toRegister.Add(updatePosition);
+        toRegister.Add(handleCollision);
 
         return toRegister;
     }
