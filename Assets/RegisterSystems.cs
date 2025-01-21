@@ -16,9 +16,8 @@ public class RegisterSystems
         var handleCollision = new HandleCollision(componentDatabase);
 
         toRegister.Add(calculatePosition);
-        toRegister.Add(updatePosition);
         toRegister.Add(handleCollision);
-
+        toRegister.Add(updatePosition);
         return toRegister;
     }
 }

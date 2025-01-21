@@ -26,7 +26,6 @@ public class Initialization : ISystem{
             componentDatabase.UpdatePositionComponent(id, shapeConfig.initialPosition);
             componentDatabase.UpdateVelocityComponent(id, shapeConfig.initialVelocity);
             componentDatabase.UpdateSizeComponent(id, shapeConfig.initialSize);
-            componentDatabase.UpdateCollisionComponent(id, null);
             ecsController.CreateShape(id, componentDatabase.sizeComponent[id].Size);
             ecsController.UpdateShapePosition(id, componentDatabase.positionComponent[id].Position);
             id++;            

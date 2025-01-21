@@ -28,6 +28,7 @@ public class HandleCollision : ISystem{
             float bottomBorder = -(verticalExtent - size1 / 2);
             float topBorder = verticalExtent - size1 / 2;
 
+            // Collision between circles
             foreach (var entry2 in _componentDatabase.positionComponent){
                 uint id2 = entry2.Key;
 
@@ -42,15 +43,12 @@ public class HandleCollision : ISystem{
                 if (distance <= radiusSum){
                     Vector2 velocity2 = _componentDatabase.velocityComponent[id2].Velocity;
 
-                    _componentDatabase.UpdateCollisionComponent(id1, id2);
-                    _componentDatabase.UpdateCollisionComponent(id2, id1);
-
                     CollisionResult collisionResult = CollisionUtility.CalculateCollision(position1,
                         velocity1, size1, position2, velocity2, size2);
 
                     if (deltaPositions.ContainsKey(id1)){
                         deltaPositions[id1] += collisionResult.position1 - position1;
-                        updatedVelocities[id1] += collisionResult.velocity1;
+                        updatedVelocities[id1] = collisionResult.velocity1;
                     } else {
                         updatedVelocities[id1] = collisionResult.velocity1;
                         deltaPositions[id1] = collisionResult.position1 - position1;
@@ -58,7 +56,7 @@ public class HandleCollision : ISystem{
 
                     if (deltaPositions.ContainsKey(id2)){
                         deltaPositions[id2] += collisionResult.position2 - position2;
-                        updatedVelocities[id2] += collisionResult.velocity2;
+                        updatedVelocities[id2] = collisionResult.velocity2;
                     } else {
                         updatedVelocities[id2] = collisionResult.velocity2;
                         deltaPositions[id2] = collisionResult.position2 - position2;
