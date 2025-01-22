@@ -11,7 +11,7 @@ public class CalculatePosition : ISystem {
             uint id = entry.Key;
             PositionComponent position = entry.Value;
             VelocityComponent velocity = _componentDatabase.velocityComponent[id];
-            if (velocity != null) {
+            if (velocity.Velocity != null) {
                 position.Position += velocity.Velocity * Time.deltaTime;
             }
         }

@@ -11,8 +11,8 @@ public class HandleCollision : ISystem{
 
     public void UpdateSystem(){
         Dictionary<uint, Vector2> deltaPositions = new();
-        Dictionary<uint, Vector2> updatedVelocities = new();
         Dictionary<uint, Vector2> deltaVelocities = new();
+        Dictionary<uint, int> deltaSizes = new();
 
         float verticalExtent = Camera.main.orthographicSize;
         float horizontalExtent = verticalExtent * Camera.main.aspect;
@@ -42,6 +42,7 @@ public class HandleCollision : ISystem{
                 float radiusSum = size1 / 2 + size2 / 2;
 
                 if (distance <= radiusSum){
+                    
                     Vector2 velocity2 = _componentDatabase.velocityComponent[id2].Velocity;
 
                     CollisionResult collisionResult = CollisionUtility.CalculateCollision(position1,
@@ -49,22 +50,41 @@ public class HandleCollision : ISystem{
 
                     if (deltaPositions.ContainsKey(id1)){
                         deltaPositions[id1] += collisionResult.position1 - position1;
-                        //updatedVelocities[id1] = collisionResult.velocity1;
                         deltaVelocities[id1] += collisionResult.velocity1 - velocity1;
                     } else {
-                        //updatedVelocities[id1] = collisionResult.velocity1;
                         deltaPositions[id1] = collisionResult.position1 - position1;
                         deltaVelocities[id1] = collisionResult.velocity1 - velocity1;
                     }
 
                     if (deltaPositions.ContainsKey(id2)){
                         deltaPositions[id2] += collisionResult.position2 - position2;
-                        //updatedVelocities[id2] = collisionResult.velocity2;
                         deltaVelocities[id2] += collisionResult.velocity2 - velocity2;
                     } else {
-                        //updatedVelocities[id2] = collisionResult.velocity2;
                         deltaPositions[id2] = collisionResult.position2 - position2;
                         deltaVelocities[id2] = collisionResult.velocity2 - velocity2;
+                    }
+
+                    // Size adjustement
+                    if (_componentDatabase.immortalComponent.ContainsKey(id1) 
+                        || _componentDatabase.immortalComponent.ContainsKey(id2)){
+                        
+                        continue;
+                    }
+
+                    if (!deltaSizes.ContainsKey(id1)){
+                        deltaSizes[id1] = 0;
+                    }
+                    if (!deltaSizes.ContainsKey(id2)){
+                        deltaSizes[id2] = 0;
+                    }
+
+                    if (size1 > size2){
+                        deltaSizes[id1]++;
+                        deltaSizes[id2]--;
+                    }
+                    else if (size1 < size2){
+                        deltaSizes[id1]--;
+                        deltaSizes[id2]++;
                     }
                 }
             }
@@ -75,20 +95,15 @@ public class HandleCollision : ISystem{
 
                 if (deltaPositions.ContainsKey(id1)){
                     Vector2 currentDelta = deltaPositions[id1];
-                    //Vector2 currentVelocity = updatedVelocities[id1];
                     Vector2 currentDeltaVelocity = deltaVelocities[id1];
 
                     currentDelta.x += newPosition - position1.x;
                     deltaPositions[id1] = currentDelta;
 
-                    //currentVelocity.x = -currentVelocity.x;
-                    //updatedVelocities[id1] = currentVelocity;
                     currentDeltaVelocity.x -= 2*velocity1.x;
                     deltaVelocities[id1] = currentDeltaVelocity;
                 } else {
                     deltaPositions[id1] = new Vector2(newPosition - position1.x, 0f);
-                    //velocity1.x = -velocity1.x;
-                    //updatedVelocities[id1] = velocity1;
                     deltaVelocities[id1] = new Vector2(-2*velocity1.x, 0f);
                 }
             }
@@ -99,20 +114,15 @@ public class HandleCollision : ISystem{
 
                 if (deltaPositions.ContainsKey(id1)){
                     Vector2 currentDelta = deltaPositions[id1];
-                    //Vector2 currentVelocity = updatedVelocities[id1];
                     Vector2 currentDeltaVelocity = deltaVelocities[id1];
 
                     currentDelta.y += newPosition - position1.y;
                     deltaPositions[id1] = currentDelta;
 
-                    //currentVelocity.y = -currentVelocity.y;
-                    //updatedVelocities[id1] = currentVelocity;
                     currentDeltaVelocity.y -= 2*velocity1.y;
                     deltaVelocities[id1] = currentDeltaVelocity;
                 } else {
                     deltaPositions[id1] = new Vector2(0f, newPosition - position1.y);
-                    //velocity1.y = -velocity1.y;
-                    //updatedVelocities[id1] = velocity1;
                     deltaVelocities[id1] = new Vector2(0f, -2*velocity1.y);
                 }
             }
@@ -123,8 +133,12 @@ public class HandleCollision : ISystem{
             uint id = update.Key;
 
             _componentDatabase.positionComponent[id].Position += update.Value;
-            //_componentDatabase.UpdateVelocityComponent(id, updatedVelocities[id]);
             _componentDatabase.velocityComponent[id].Velocity += deltaVelocities[id];
+            if (deltaSizes.ContainsKey(id)){
+                _componentDatabase.sizeComponent[id].Size += deltaSizes[id];
+            }
+
+            // Color change GREEN !!
         }
     }
 }

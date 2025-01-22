@@ -10,6 +10,9 @@ public class VelocityComponent : IComponent{
 public class SizeComponent : IComponent{
     public int Size {get; set;}
 }
+public class ImmortalComponent : IComponent{
+    public bool IsImmortal {get; set;}
+}
 public class CooldownComponent : IComponent{
     public float DeltaTime {get; set;}
 }

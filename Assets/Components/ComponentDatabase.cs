@@ -8,6 +8,7 @@ public class ComponentDatabase {
     public readonly Dictionary<uint, PositionComponent> positionComponent = new();
     public readonly Dictionary<uint, VelocityComponent> velocityComponent = new();
     public readonly Dictionary<uint, SizeComponent> sizeComponent = new();
+    public readonly Dictionary<uint, ImmortalComponent> immortalComponent = new();
 
     private void UpdateComponent<T>(Dictionary<uint, T> componentDict, uint id, T newComponent){
         if (componentDict.ContainsKey(id)){
@@ -25,5 +26,13 @@ public class ComponentDatabase {
     }
     public void UpdateSizeComponent(uint id, int size){
         UpdateComponent(sizeComponent, id, new SizeComponent { Size = size });        
+    }
+    public void UpdateImmortalComponent(uint id, bool isImmortal){
+        UpdateComponent(immortalComponent, id, new ImmortalComponent { IsImmortal = isImmortal });
+    }
+    public void DestroyId(uint id){
+        positionComponent.Remove(id);
+        velocityComponent.Remove(id);
+        sizeComponent.Remove(id);
     }
 }

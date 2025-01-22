@@ -26,6 +26,9 @@ public class Initialization : ISystem{
             componentDatabase.UpdatePositionComponent(id, shapeConfig.initialPosition);
             componentDatabase.UpdateVelocityComponent(id, shapeConfig.initialVelocity);
             componentDatabase.UpdateSizeComponent(id, shapeConfig.initialSize);
+            if (componentDatabase.velocityComponent[id].Velocity == new Vector2(0f,0f)){
+                componentDatabase.UpdateImmortalComponent(id, true);
+            }
             ecsController.CreateShape(id, componentDatabase.sizeComponent[id].Size);
             ecsController.UpdateShapePosition(id, componentDatabase.positionComponent[id].Position);
             id++;            
