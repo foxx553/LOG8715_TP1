@@ -5,6 +5,7 @@ using UnityEngine; // to have access to Vector2 type
 public class ComponentDatabase {
 
     public float startTime = 0;
+    public uint entitiesCounter = 0;
     public readonly Dictionary<uint, PositionComponent> positionComponent = new();
     public readonly Dictionary<uint, VelocityComponent> velocityComponent = new();
     public readonly Dictionary<uint, SizeComponent> sizeComponent = new();

@@ -12,13 +12,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44f6298b63162af49b161af8f69d4513, type: 3}
   m_Name: Config
   m_EditorClassIdentifier: 
-  seed: 2147483647
-  explosionSize: 10
+  explosionSize: 12
   protectionSize: 2
-  protectionProbability: 0.01
+  protectionCollisionCount: 3
   protectionDuration: 5
   protectionCooldown: 15
-  allShapesToSpawn: []
+  circleInstancesToSpawn:
+  - initialSize: 5
+    initialPosition: {x: -10, y: -10}
+    initialVelocity: {x: 20, y: 20}
+  - initialSize: 4
+    initialPosition: {x: 2, y: 2}
+    initialVelocity: {x: 30, y: -15}
+  - initialSize: 2
+    initialPosition: {x: -20, y: -20}
+    initialVelocity: {x: 2, y: -5}
+  - initialSize: 3
+    initialPosition: {x: 30, y: 0}
+    initialVelocity: {x: 40, y: 0}
+  - initialSize: 5
+    initialPosition: {x: -15, y: -15}
+    initialVelocity: {x: 50, y: 50}
   systemsEnabled:
-    keys: []
-    values: 
+    keys:
+    - Initialization
+    - CalculatePosition
+    - HandleCollision
+    - UpdatePosition
+    - UpdateSize
+    - HandleExplosion
+    values: 010101010101

@@ -19,19 +19,17 @@ public class Initialization : ISystem{
 
         var ecsController = ECSController.Instance;
 
-        uint id = 0;
-
         foreach (var shapeConfig in ecsController.Config.circleInstancesToSpawn)
         {
-            componentDatabase.UpdatePositionComponent(id, shapeConfig.initialPosition);
-            componentDatabase.UpdateVelocityComponent(id, shapeConfig.initialVelocity);
-            componentDatabase.UpdateSizeComponent(id, shapeConfig.initialSize);
-            if (componentDatabase.velocityComponent[id].Velocity == new Vector2(0f,0f)){
-                componentDatabase.UpdateImmortalComponent(id, true);
+            componentDatabase.UpdatePositionComponent(componentDatabase.entitiesCounter, shapeConfig.initialPosition);
+            componentDatabase.UpdateVelocityComponent(componentDatabase.entitiesCounter, shapeConfig.initialVelocity);
+            componentDatabase.UpdateSizeComponent(componentDatabase.entitiesCounter, shapeConfig.initialSize);
+            if (componentDatabase.velocityComponent[componentDatabase.entitiesCounter].Velocity == new Vector2(0f,0f)){
+                componentDatabase.UpdateImmortalComponent(componentDatabase.entitiesCounter, true);
             }
-            ecsController.CreateShape(id, componentDatabase.sizeComponent[id].Size);
-            ecsController.UpdateShapePosition(id, componentDatabase.positionComponent[id].Position);
-            id++;            
+            ecsController.CreateShape(componentDatabase.entitiesCounter, componentDatabase.sizeComponent[componentDatabase.entitiesCounter].Size);
+            ecsController.UpdateShapePosition(componentDatabase.entitiesCounter, componentDatabase.positionComponent[componentDatabase.entitiesCounter].Position);
+            componentDatabase.entitiesCounter++;            
         }
         _initialized = true;
     }

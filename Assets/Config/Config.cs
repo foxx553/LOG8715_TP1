@@ -23,7 +23,7 @@ public class Config : ScriptableObject {
     [Header("Simulation")]
     [SerializeField]
     [Tooltip("At this size, circles explode")]
-    public int explosionSize = 10;
+    public int explosionSize = 12;
     [SerializeField]
     [Tooltip("At this size, circles can be protected")]
     public int protectionSize = 2;
