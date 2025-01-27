@@ -10,6 +10,8 @@ public class HandleCollision : ISystem{
     }
 
     public void UpdateSystem(){
+        var ecsController = ECSController.Instance;
+
         Dictionary<uint, Vector2> deltaPositions = new();
         Dictionary<uint, Vector2> deltaVelocities = new();
         Dictionary<uint, int> deltaSizes = new();
@@ -70,7 +72,6 @@ public class HandleCollision : ISystem{
                         
                         continue;
                     }
-
                     if (!deltaSizes.ContainsKey(id1)){
                         deltaSizes[id1] = 0;
                     }
@@ -78,6 +79,16 @@ public class HandleCollision : ISystem{
                         deltaSizes[id2] = 0;
                     }
 
+                    
+                    if (_componentDatabase.sizeComponent[id1].Size <= ecsController.Config.protectionSize
+                        && _componentDatabase.protectionComponent[id1].ProtectionCount < ecsController.Config.protectionCollisionCount){
+                            _componentDatabase.protectionComponent[id1].ProtectionCount++;
+                        }
+                    
+                    if (_componentDatabase.sizeComponent[id2].Size <= ecsController.Config.protectionSize
+                        && _componentDatabase.protectionComponent[id2].ProtectionCount < ecsController.Config.protectionCollisionCount){
+                            _componentDatabase.protectionComponent[id1].ProtectionCount++;
+                        }
                     if (size1 > size2){
                         deltaSizes[id1]++;
                         deltaSizes[id2]--;

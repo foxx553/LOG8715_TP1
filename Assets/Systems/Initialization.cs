@@ -27,6 +27,7 @@ public class Initialization : ISystem{
             if (componentDatabase.velocityComponent[componentDatabase.entitiesCounter].Velocity == new Vector2(0f,0f)){
                 componentDatabase.UpdateImmortalComponent(componentDatabase.entitiesCounter, true);
             }
+            componentDatabase.UpdateProtectionComponent(componentDatabase.entitiesCounter, 0);
             ecsController.CreateShape(componentDatabase.entitiesCounter, componentDatabase.sizeComponent[componentDatabase.entitiesCounter].Size);
             ecsController.UpdateShapePosition(componentDatabase.entitiesCounter, componentDatabase.positionComponent[componentDatabase.entitiesCounter].Position);
             componentDatabase.entitiesCounter++;            

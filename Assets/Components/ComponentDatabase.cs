@@ -10,6 +10,7 @@ public class ComponentDatabase {
     public readonly Dictionary<uint, VelocityComponent> velocityComponent = new();
     public readonly Dictionary<uint, SizeComponent> sizeComponent = new();
     public readonly Dictionary<uint, ImmortalComponent> immortalComponent = new();
+    public readonly Dictionary<uint, ProtectionComponent> protectionComponent = new();
 
     private void UpdateComponent<T>(Dictionary<uint, T> componentDict, uint id, T newComponent){
         if (componentDict.ContainsKey(id)){
@@ -30,6 +31,9 @@ public class ComponentDatabase {
     }
     public void UpdateImmortalComponent(uint id, bool isImmortal){
         UpdateComponent(immortalComponent, id, new ImmortalComponent { IsImmortal = isImmortal });
+    }
+    public void UpdateProtectionComponent(uint id, int protectionCount){
+        UpdateComponent(protectionComponent, id, new ProtectionComponent { ProtectionCount = protectionCount}) ;
     }
     public void DestroyId(uint id){
         positionComponent.Remove(id);
