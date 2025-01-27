@@ -14,7 +14,7 @@ public class HandleExplosion : ISystem{
 
         var ecsController = ECSController.Instance;
         var newSize = (int) Math.Ceiling(ecsController.Config.explosionSize / 4.0);
-        var newPositionOffset = (float) (newSize / 2.0 * 1.5);
+        var newPositionOffset = (float) (newSize / 1.9); // Instead of 2.0, to prevent unwanted collision
         List<uint> idsToRemove = new List<uint>();
         List<Vector2> newPositions = new List<Vector2>();
         List<Vector2> newVelocities = new List<Vector2>();
@@ -26,18 +26,18 @@ public class HandleExplosion : ISystem{
                 idsToRemove.Add(sizeEntry.Key);
                 var currentPosition = _componentDatabase.positionComponent[currentId].Position;
                 var currentVelocity = _componentDatabase.velocityComponent[currentId].Velocity;
-                var currentVelocityNorm = Math.Sqrt(Math.Pow(currentVelocity.x,2) + Math.Pow(currentVelocity.y,2)) * 2.0;
+                var newVelocityOffset = Math.Sqrt(Math.Pow(currentVelocity.x,2) + Math.Pow(currentVelocity.y,2)) * Math.Sqrt(2.0);
                 newPositions.AddRange(new List<Vector2>(){
-                    new Vector2(currentPosition.x + newPositionOffset, currentPosition.y),
-                    new Vector2(currentPosition.x - newPositionOffset, currentPosition.y),
-                    new Vector2(currentPosition.x, currentPosition.y + newPositionOffset),
-                    new Vector2(currentPosition.x, currentPosition.y - newPositionOffset)
+                    new Vector2(currentPosition.x + newPositionOffset, currentPosition.y + newPositionOffset),
+                    new Vector2(currentPosition.x + newPositionOffset, currentPosition.y - newPositionOffset),
+                    new Vector2(currentPosition.x - newPositionOffset, currentPosition.y + newPositionOffset),
+                    new Vector2(currentPosition.x - newPositionOffset, currentPosition.y - newPositionOffset),
                 });
                 newVelocities.AddRange(new List<Vector2>(){
-                    new Vector2((float) currentVelocityNorm, 0f),
-                    new Vector2((float) -currentVelocityNorm, 0f),
-                    new Vector2(0f, (float) currentVelocityNorm),
-                    new Vector2(0f, (float) -currentVelocityNorm)
+                    new Vector2((float) newVelocityOffset, (float) newVelocityOffset),
+                    new Vector2((float) newVelocityOffset, (float) -newVelocityOffset),
+                    new Vector2((float) -newVelocityOffset, (float) newVelocityOffset),
+                    new Vector2((float) -newVelocityOffset, (float) -newVelocityOffset),
                 });
             }            
         }
