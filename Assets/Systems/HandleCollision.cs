@@ -138,7 +138,7 @@ public class HandleCollision : ISystem{
                 _componentDatabase.sizeComponent[id].Size += deltaSizes[id];
             }
 
-            // Color change GREEN !!
+            _componentDatabase.UpdateIsCollidiingComponent(id, true);
         }
     }
 }
