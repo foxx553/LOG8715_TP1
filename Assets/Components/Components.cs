@@ -17,9 +17,12 @@ public class ImmortalComponent : IComponent
 {
     public bool IsImmortal { get; set; }
 }
-public class CooldownComponent : IComponent
-{
-    public float DeltaTime { get; set; }
+
+public class ProtectionComponent : IComponent{
+    public int ProtectionCount {get; set;}
+}
+public class CooldownComponent : IComponent{
+    public float DeltaTime {get; set;}
 }
 
 public class IsColliding : IComponent { }

@@ -12,6 +12,7 @@ public class ComponentDatabase
     public readonly Dictionary<uint, SizeComponent> sizeComponent = new();
     public readonly Dictionary<uint, ImmortalComponent> immortalComponent = new();
     public readonly Dictionary<uint, IsColliding> isCollidingComponent = new();
+    public readonly Dictionary<uint, ProtectionComponent> protectionComponent = new();
 
     private void UpdateComponent<T>(Dictionary<uint, T> componentDict, uint id, T newComponent)
     {
@@ -49,12 +50,16 @@ public class ComponentDatabase
 
     }
 
-    public void DestroyId(uint id)
-    {
+    public void UpdateProtectionComponent(uint id, int protectionCount){
+        UpdateComponent(protectionComponent, id, new ProtectionComponent { ProtectionCount = protectionCount}) ;
+    }
+
+    public void DestroyId(uint id){
         positionComponent.Remove(id);
         velocityComponent.Remove(id);
         sizeComponent.Remove(id);
         immortalComponent.Remove(id);
         isCollidingComponent.Remove(id);
+        protectionComponent.Remove(id);
     }
 }
