@@ -16,12 +16,14 @@ public class RegisterSystems
         var handleCollision = new HandleCollision(componentDatabase);
         var updateSize = new UpdateSize(componentDatabase);
         var handleExplosion = new HandleExplosion(componentDatabase);
+        var updateColor = new UpdateColor(componentDatabase);
 
         toRegister.Add(calculatePosition);
         toRegister.Add(handleCollision);
         toRegister.Add(updatePosition);
         toRegister.Add(updateSize);
         toRegister.Add(handleExplosion);
+        toRegister.Add(updateColor);
         return toRegister;
     }
 }
