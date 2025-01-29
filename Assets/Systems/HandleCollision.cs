@@ -172,6 +172,10 @@ public class HandleCollision : ISystem
             if (deltaSizes.ContainsKey(id))
             {
                 _componentDatabase.sizeComponent[id].Size += deltaSizes[id];
+                if (_componentDatabase.sizeComponent[id].Size <= ecsController.Config.protectionSize)
+                {
+                    _componentDatabase.UpdateIsProtectable(id, 0);
+                }
             }
 
             _componentDatabase.UpdateIsCollidiing(id, true);
