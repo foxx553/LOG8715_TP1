@@ -15,6 +15,7 @@ public class ComponentDatabase
     public readonly Dictionary<uint, IsColliding> isColliding = new();
     public readonly Dictionary<uint, IsProtectable> isProtectable = new();
     public readonly Dictionary<uint, IsProtected> isProtected = new();
+    public readonly Dictionary<uint, CooldownComponent> cooldownComponent = new();
 
     private void UpdateComponent<T>(Dictionary<uint, T> componentDict, uint id, T newComponent)
     {

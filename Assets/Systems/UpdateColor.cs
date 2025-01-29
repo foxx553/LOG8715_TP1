@@ -27,6 +27,11 @@ public class UpdateColor : ISystem
             {
                 ecsController.UpdateShapeColor(id, UnityEngine.Color.white);
             }
+            else if (_componentDatabase.isProtectable.ContainsKey(id))
+            {
+                ecsController.UpdateShapeColor(id, UnityEngine.Color.cyan);
+            }
+            // else if (_componentDatabase.cooldownComponent)
             else
             {
                 ecsController.UpdateShapeColor(id, UnityEngine.Color.blue);
