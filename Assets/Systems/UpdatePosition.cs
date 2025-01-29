@@ -6,12 +6,13 @@ public class UpdatePosition : ISystem {
     public UpdatePosition(ComponentDatabase componentDatabase){
         _componentDatabase = componentDatabase;
     }
-
     public void UpdateSystem() {
         var ecsController = ECSController.Instance;
         foreach (var entry in _componentDatabase.velocityComponent){
             if (entry.Value != null) {
                 uint id = entry.Key;
+                if (_componentDatabase.positionComponent[id].Position.x > 0f /////
+                && ((_componentDatabase.frameCounter % 4) != 0)) continue;
                 ecsController.UpdateShapePosition(id, _componentDatabase.positionComponent[id].Position);
             }
         }

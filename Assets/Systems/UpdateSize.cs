@@ -13,6 +13,10 @@ public class UpdateSize : ISystem {
         foreach (var entry in _componentDatabase.sizeComponent){
             if (entry.Value != null) {
                 uint id = entry.Key;
+                
+                if (_componentDatabase.positionComponent[id].Position.x > 0f /////
+                && ((_componentDatabase.frameCounter % 4) != 0)) continue;
+
                 ecsController.UpdateShapeSize(id, _componentDatabase.sizeComponent[id].Size);
                 if (_componentDatabase.sizeComponent[id].Size <= 0){
                     idsToRemove.Add(id);

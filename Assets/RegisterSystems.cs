@@ -17,13 +17,15 @@ public class RegisterSystems
         var updateSize = new UpdateSize(componentDatabase);
         var handleExplosion = new HandleExplosion(componentDatabase);
         var updateColor = new UpdateColor(componentDatabase);
+        var handleTime = new HandleTime(componentDatabase);
 
         toRegister.Add(calculatePosition);
         toRegister.Add(handleCollision);
-        toRegister.Add(updatePosition);
-        toRegister.Add(updateSize);
         toRegister.Add(handleExplosion);
+        toRegister.Add(updateSize);
+        toRegister.Add(updatePosition);
         toRegister.Add(updateColor);
+        toRegister.Add(handleTime);
         return toRegister;
     }
 }

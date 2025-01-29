@@ -96,11 +96,14 @@ public class HandleCollision : ISystem
 
                     if (size1 == size2 && size1 <= ecsController.Config.protectionSize)
                     {
-                        if (_componentDatabase.isProtectable[id1].ProtectionCount < ecsController.Config.protectionCollisionCount)
+                        if (_componentDatabase.isProtectable.ContainsKey(id1)){
+                            if (_componentDatabase.isProtectable[id1].ProtectionCount < ecsController.Config.protectionCollisionCount)
                             _componentDatabase.isProtectable[id1].ProtectionCount++;
-                        if (_componentDatabase.isProtectable[id2].ProtectionCount < ecsController.Config.protectionCollisionCount)
+                        }
+                        if (_componentDatabase.isProtectable.ContainsKey(id1)){
+                            if (_componentDatabase.isProtectable[id2].ProtectionCount < ecsController.Config.protectionCollisionCount)
                             _componentDatabase.isProtectable[id1].ProtectionCount++;
-
+                        }    
                     }
                     else if (size1 > size2)
                     {
@@ -166,6 +169,8 @@ public class HandleCollision : ISystem
         foreach (var update in deltaPositions)
         {
             uint id = update.Key;
+            if (_componentDatabase.positionComponent[id].Position.x > 0f ////
+            && ((_componentDatabase.frameCounter % 4) != 0)) continue;
 
             _componentDatabase.positionComponent[id].Position += update.Value;
             _componentDatabase.velocityComponent[id].Velocity += deltaVelocities[id];

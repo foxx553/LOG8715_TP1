@@ -14,6 +14,9 @@ public class UpdateColor : ISystem
         var ecsController = ECSController.Instance;
         foreach (uint id in _componentDatabase.positionComponent.Keys)
         {
+            if (_componentDatabase.positionComponent[id].Position.x > 0f //////
+                && ((_componentDatabase.frameCounter % 4) != 0)) continue;
+
             if (_componentDatabase.isStatic.ContainsKey(id))
             {
                 ecsController.UpdateShapeColor(id, UnityEngine.Color.red);
