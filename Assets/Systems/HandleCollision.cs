@@ -100,9 +100,9 @@ public class HandleCollision : ISystem
                             if (_componentDatabase.isProtectable[id1].ProtectionCount < ecsController.Config.protectionCollisionCount)
                             _componentDatabase.isProtectable[id1].ProtectionCount++;
                         }
-                        if (_componentDatabase.isProtectable.ContainsKey(id1)){
+                        if (_componentDatabase.isProtectable.ContainsKey(id2)){
                             if (_componentDatabase.isProtectable[id2].ProtectionCount < ecsController.Config.protectionCollisionCount)
-                            _componentDatabase.isProtectable[id1].ProtectionCount++;
+                            _componentDatabase.isProtectable[id2].ProtectionCount++;
                         }    
                     }
                     else if (size1 > size2)

@@ -13,6 +13,6 @@ public class HandleTime : ISystem {
 
     public void UpdateSystem(){
         _componentDatabase.frameCounter += 1;
-        _componentDatabase.totalTime += Time.deltaTime;   
+        _componentDatabase.totalTime += Time.deltaTime;
     }
 }

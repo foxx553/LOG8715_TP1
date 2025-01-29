@@ -16,7 +16,6 @@ public class Initialization : ISystem{
     public void UpdateSystem(){
         if (_initialized)
             return;
-
         var ecsController = ECSController.Instance;
 
         foreach (var shapeConfig in ecsController.Config.circleInstancesToSpawn)
