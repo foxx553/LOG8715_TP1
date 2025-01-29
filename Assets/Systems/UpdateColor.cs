@@ -14,14 +14,14 @@ public class UpdateColor : ISystem
         var ecsController = ECSController.Instance;
         foreach (uint id in _componentDatabase.positionComponent.Keys)
         {
-            if (_componentDatabase.isStaticComponent.ContainsKey(id))
+            if (_componentDatabase.isStatic.ContainsKey(id))
             {
                 ecsController.UpdateShapeColor(id, UnityEngine.Color.red);
             }
-            else if (_componentDatabase.isCollidingComponent.ContainsKey(id))
+            else if (_componentDatabase.isColliding.ContainsKey(id))
             {
                 ecsController.UpdateShapeColor(id, UnityEngine.Color.green);
-                _componentDatabase.UpdateIsCollidiingComponent(id, false);
+                _componentDatabase.UpdateIsCollidiing(id, false);
             }
             else if (_componentDatabase.isProtected.ContainsKey(id))
             {

@@ -51,7 +51,9 @@ public class HandleExplosion : ISystem{
             _componentDatabase.UpdatePositionComponent(_componentDatabase.entitiesCounter, newPositions[newCircleIndex]);
             _componentDatabase.UpdateVelocityComponent(_componentDatabase.entitiesCounter, newVelocities[newCircleIndex]);
             _componentDatabase.UpdateSizeComponent(_componentDatabase.entitiesCounter, newSize);
-            _componentDatabase.UpdateProtectionComponent(_componentDatabase.entitiesCounter, 0);
+            if (newSize == ecsController.Config.protectionSize)
+                _componentDatabase.UpdateIsProtectable(_componentDatabase.entitiesCounter, 0);
+            // _componentDatabase.UpdateProtectionComponent(_componentDatabase.entitiesCounter, 0);
             ecsController.CreateShape(_componentDatabase.entitiesCounter, _componentDatabase.sizeComponent[_componentDatabase.entitiesCounter].Size);
             ecsController.UpdateShapePosition(_componentDatabase.entitiesCounter, _componentDatabase.positionComponent[_componentDatabase.entitiesCounter].Position);
             _componentDatabase.entitiesCounter++;

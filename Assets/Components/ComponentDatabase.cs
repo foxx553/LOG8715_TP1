@@ -11,7 +11,7 @@ public class ComponentDatabase
     public readonly Dictionary<uint, VelocityComponent> velocityComponent = new();
     public readonly Dictionary<uint, SizeComponent> sizeComponent = new();
     public readonly Dictionary<uint, IsStatic> isStatic = new();
-    public readonly Dictionary<uint, ImmortalComponent> immortalComponent = new();
+    public readonly Dictionary<uint, IsImmortal> isImmortal = new();
     public readonly Dictionary<uint, IsColliding> isColliding = new();
     public readonly Dictionary<uint, IsProtectable> isProtectable = new();
     public readonly Dictionary<uint, IsProtected> isProtected = new();
@@ -39,20 +39,22 @@ public class ComponentDatabase
     {
         UpdateComponent(sizeComponent, id, new SizeComponent { Size = size });
     }
-    public void UpdateIsStatic(uint id, int size)
+    public void UpdateIsStatic(uint id)
     {
-        UpdateComponent(isStaticComponent, id, new isStatic());
+        UpdateComponent(isStatic, id, new IsStatic());
     }
-    public void UpdateImmortalComponent(uint id, bool isImmortal)
+    public void UpdateIsImmortal(uint id, bool isImmortal)
     {
-        UpdateComponent(immortalComponent, id, new ImmortalComponent { IsImmortal = isImmortal });
+        if (isImmortal)
+            UpdateComponent(this.isImmortal, id, new IsImmortal());
+        else this.isImmortal.Remove(id);
     }
 
     public void UpdateIsCollidiing(uint id, bool isColliding)
     {
         if (isColliding)
-            UpdateComponent(isCollidingComponent, id, new IsColliding());
-        else isCollidingComponent.Remove(id);
+            UpdateComponent(this.isColliding, id, new IsColliding());
+        else this.isColliding.Remove(id);
 
     }
 
@@ -61,18 +63,19 @@ public class ComponentDatabase
         UpdateComponent(isProtectable, id, new IsProtectable { ProtectionCount = protectionCount });
     }
 
-    public void UpdateIsProtected(uint id, int countdown)
+    public void UpdateIsProtected(uint id, int countdown = -1)
     {
-        UpdateComponent(isProtectable, id, new IsProtected { CountDown = countdown });
+        if (countdown == -1)
+            isProtected.Remove(id);
+        else
+            UpdateComponent(isProtected, id, new IsProtected { CountDown = countdown });
     }
 
     public void DestroyId(uint id){
         positionComponent.Remove(id);
         velocityComponent.Remove(id);
         sizeComponent.Remove(id);
-        immortalComponent.Remove(id);
-        isColliding.Remove(id);
+        isImmortal.Remove(id);
         isProtectable.Remove(id);
-        isProtected.Remove(id);
     }
 }
