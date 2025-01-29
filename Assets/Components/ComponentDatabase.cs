@@ -10,9 +10,11 @@ public class ComponentDatabase
     public readonly Dictionary<uint, PositionComponent> positionComponent = new();
     public readonly Dictionary<uint, VelocityComponent> velocityComponent = new();
     public readonly Dictionary<uint, SizeComponent> sizeComponent = new();
+    public readonly Dictionary<uint, IsStatic> isStatic = new();
     public readonly Dictionary<uint, ImmortalComponent> immortalComponent = new();
-    public readonly Dictionary<uint, IsColliding> isCollidingComponent = new();
-    public readonly Dictionary<uint, ProtectionComponent> protectionComponent = new();
+    public readonly Dictionary<uint, IsColliding> isColliding = new();
+    public readonly Dictionary<uint, IsProtectable> isProtectable = new();
+    public readonly Dictionary<uint, IsProtected> isProtected = new();
 
     private void UpdateComponent<T>(Dictionary<uint, T> componentDict, uint id, T newComponent)
     {
@@ -37,12 +39,16 @@ public class ComponentDatabase
     {
         UpdateComponent(sizeComponent, id, new SizeComponent { Size = size });
     }
+    public void UpdateIsStatic(uint id, int size)
+    {
+        UpdateComponent(isStaticComponent, id, new isStatic());
+    }
     public void UpdateImmortalComponent(uint id, bool isImmortal)
     {
         UpdateComponent(immortalComponent, id, new ImmortalComponent { IsImmortal = isImmortal });
     }
 
-    public void UpdateIsCollidiingComponent(uint id, bool isColliding)
+    public void UpdateIsCollidiing(uint id, bool isColliding)
     {
         if (isColliding)
             UpdateComponent(isCollidingComponent, id, new IsColliding());
@@ -50,8 +56,14 @@ public class ComponentDatabase
 
     }
 
-    public void UpdateProtectionComponent(uint id, int protectionCount){
-        UpdateComponent(protectionComponent, id, new ProtectionComponent { ProtectionCount = protectionCount}) ;
+    public void UpdateIsProtectable(uint id, int protectionCount)
+    {
+        UpdateComponent(isProtectable, id, new IsProtectable { ProtectionCount = protectionCount });
+    }
+
+    public void UpdateIsProtected(uint id, int countdown)
+    {
+        UpdateComponent(isProtectable, id, new IsProtected { CountDown = countdown });
     }
 
     public void DestroyId(uint id){
@@ -59,7 +71,8 @@ public class ComponentDatabase
         velocityComponent.Remove(id);
         sizeComponent.Remove(id);
         immortalComponent.Remove(id);
-        isCollidingComponent.Remove(id);
-        protectionComponent.Remove(id);
+        isColliding.Remove(id);
+        isProtectable.Remove(id);
+        isProtected.Remove(id);
     }
 }

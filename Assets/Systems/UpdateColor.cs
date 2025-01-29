@@ -14,29 +14,23 @@ public class UpdateColor : ISystem
         var ecsController = ECSController.Instance;
         foreach (uint id in _componentDatabase.positionComponent.Keys)
         {
-            if (_componentDatabase.isCollidingComponent.ContainsKey(id))
+            if (_componentDatabase.isStaticComponent.ContainsKey(id))
+            {
+                ecsController.UpdateShapeColor(id, UnityEngine.Color.red);
+            }
+            else if (_componentDatabase.isCollidingComponent.ContainsKey(id))
             {
                 ecsController.UpdateShapeColor(id, UnityEngine.Color.green);
                 _componentDatabase.UpdateIsCollidiingComponent(id, false);
             }
-            else
+            else if (_componentDatabase.isProtected.ContainsKey(id))
             {
                 ecsController.UpdateShapeColor(id, UnityEngine.Color.white);
             }
+            else
+            {
+                ecsController.UpdateShapeColor(id, UnityEngine.Color.blue);
+            }
         }
-
-        // for (uint i = 0; i < _componentDatabase.entitiesCounter; i++)
-        // {
-        //     uint id = (uint)i;
-        //     if (_componentDatabase.isCollidingComponent.ContainsKey(i))
-        //     {
-        //         ecsController.UpdateShapeColor(id, UnityEngine.Color.green);
-        //         _componentDatabase.UpdateIsCollidiingComponent(id, false);
-        //     }
-        //     else
-        //     {
-        //         ecsController.UpdateShapeColor(id, UnityEngine.Color.white);
-        //     }
-        // }
     }
 }

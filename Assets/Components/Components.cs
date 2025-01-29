@@ -13,14 +13,23 @@ public class SizeComponent : IComponent
 {
     public int Size { get; set; }
 }
+
+public class IsStatic : IComponent { }
 public class ImmortalComponent : IComponent
 {
     public bool IsImmortal { get; set; }
 }
 
-public class ProtectionComponent : IComponent{
+public class IsProtectable : IComponent
+{
     public int ProtectionCount {get; set;}
 }
+
+public class IsProtected : IComponent
+{
+    public int CountDown { get; set; }
+}
+
 public class CooldownComponent : IComponent{
     public float DeltaTime {get; set;}
 }
