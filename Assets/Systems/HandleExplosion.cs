@@ -23,10 +23,14 @@ public class HandleExplosion : ISystem{
         {
             if (sizeEntry.Value.Size >= ecsController.Config.explosionSize) {
                 var currentId = sizeEntry.Key;
+
+                if (_componentDatabase.positionComponent[currentId].Position.x > 0f ////
+                    && ((_componentDatabase.frameCounter % 4) != 0)) continue;
+
                 idsToRemove.Add(sizeEntry.Key);
                 var currentPosition = _componentDatabase.positionComponent[currentId].Position;
                 var currentVelocity = _componentDatabase.velocityComponent[currentId].Velocity;
-                var newVelocityOffset = Math.Sqrt(Math.Pow(currentVelocity.x,2) + Math.Pow(currentVelocity.y,2)) * Math.Sqrt(2.0);
+                var newVelocityOffset = Math.Sqrt(Math.Pow(currentVelocity.x,2) + Math.Pow(currentVelocity.y,2)) / Math.Sqrt(2.0);
                 newPositions.AddRange(new List<Vector2>(){
                     new Vector2(currentPosition.x + newPositionOffset, currentPosition.y + newPositionOffset),
                     new Vector2(currentPosition.x + newPositionOffset, currentPosition.y - newPositionOffset),
@@ -43,8 +47,9 @@ public class HandleExplosion : ISystem{
         }
 
         foreach (var id in idsToRemove){
-            ecsController.DestroyShape(id);
-            _componentDatabase.DestroyId(id);
+            //ecsController.DestroyShape(id);
+            //_componentDatabase.DestroyId(id);
+            _componentDatabase.sizeComponent[id].Size = 0;
         }
 
         for (int newCircleIndex = 0; newCircleIndex < newPositions.Count; newCircleIndex++) {
@@ -55,7 +60,7 @@ public class HandleExplosion : ISystem{
                 _componentDatabase.UpdateIsProtectable(_componentDatabase.entitiesCounter, 0);
             // _componentDatabase.UpdateProtectionComponent(_componentDatabase.entitiesCounter, 0);
             ecsController.CreateShape(_componentDatabase.entitiesCounter, _componentDatabase.sizeComponent[_componentDatabase.entitiesCounter].Size);
-            ecsController.UpdateShapePosition(_componentDatabase.entitiesCounter, _componentDatabase.positionComponent[_componentDatabase.entitiesCounter].Position);
+            //ecsController.UpdateShapePosition(_componentDatabase.entitiesCounter, _componentDatabase.positionComponent[_componentDatabase.entitiesCounter].Position);
             _componentDatabase.entitiesCounter++;
         }
     }

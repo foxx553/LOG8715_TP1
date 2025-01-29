@@ -4,8 +4,8 @@ using UnityEngine; // to have access to Vector2 type
 [System.Serializable]
 public class ComponentDatabase
 {
-
-    public float startTime = 0;
+    public float totalTime = 0f;
+    public uint frameCounter = 1;
     public uint entitiesCounter = 0;
     public readonly Dictionary<uint, PositionComponent> positionComponent = new();
     public readonly Dictionary<uint, VelocityComponent> velocityComponent = new();
@@ -78,5 +78,6 @@ public class ComponentDatabase
         sizeComponent.Remove(id);
         isImmortal.Remove(id);
         isProtectable.Remove(id);
+        isProtected.Remove(id);
     }
 }

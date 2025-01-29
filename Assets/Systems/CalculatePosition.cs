@@ -10,9 +10,12 @@ public class CalculatePosition : ISystem {
         foreach (var entry in _componentDatabase.positionComponent) {
             uint id = entry.Key;
             PositionComponent position = entry.Value;
+            
+            if (position.Position.x > 0f && ((_componentDatabase.frameCounter % 4) != 0)) continue;
+
             VelocityComponent velocity = _componentDatabase.velocityComponent[id];
             if (velocity.Velocity != null) {
-                position.Position += velocity.Velocity * Time.deltaTime;
+                position.Position += velocity.Velocity * (4 * Time.deltaTime);
             }
         }
     }
