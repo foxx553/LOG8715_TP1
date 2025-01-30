@@ -64,12 +64,17 @@ public class ComponentDatabase
         UpdateComponent(isProtectable, id, new IsProtectable { ProtectionCount = protectionCount });
     }
 
-    public void UpdateIsProtected(uint id, int countdown = -1)
+    public void UpdateIsProtected(uint id, float deltaTime)
     {
-        if (countdown == -1)
+        if (deltaTime <= 0)
             isProtected.Remove(id);
         else
-            UpdateComponent(isProtected, id, new IsProtected { CountDown = countdown });
+            UpdateComponent(isProtected, id, new IsProtected { DeltaTime = deltaTime });
+    }
+
+    public void UpdateCooldownComponent(uint id, float deltaTime)
+    {
+        UpdateComponent(cooldownComponent, id, new CooldownComponent { DeltaTime = deltaTime });
     }
 
     public void DestroyId(uint id){

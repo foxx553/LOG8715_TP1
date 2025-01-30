@@ -24,7 +24,7 @@ public class IsProtectable : IComponent
 
 public class IsProtected : IComponent
 {
-    public int CountDown { get; set; }
+    public float DeltaTime { get; set; }
 }
 
 public class CooldownComponent : IComponent
