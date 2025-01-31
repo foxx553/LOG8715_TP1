@@ -7,17 +7,17 @@ public class RegisterSystems
         // determine order of systems to add
         var toRegister = new List<ISystem>();
         // Add your systems here
-        var initialization = new Initialization();
+        var initialization = new InitializationArray();
         toRegister.Add(initialization);
 
         var componentDatabase = initialization.componentDatabase;
-        var calculatePosition = new CalculatePosition(componentDatabase);
-        var updatePosition = new UpdatePosition(componentDatabase);
-        var handleCollision = new HandleCollision(componentDatabase);
-        var updateSize = new UpdateSize(componentDatabase);
-        var handleExplosion = new HandleExplosion(componentDatabase);
-        var updateColor = new UpdateColor(componentDatabase);
-        var handleTime = new HandleTime(componentDatabase);
+        var calculatePosition = new CalculatePositionArray(componentDatabase);
+        var updatePosition = new UpdatePositionArray(componentDatabase);
+        var handleCollision = new HandleCollisionArray(componentDatabase);
+        var updateSize = new UpdateSizeArray(componentDatabase);
+        var handleExplosion = new HandleExplosionArray(componentDatabase);
+        var updateColor = new UpdateColorArray(componentDatabase);
+        var handleTime = new HandleTimeArray(componentDatabase);
 
         toRegister.Add(calculatePosition);
         toRegister.Add(handleCollision);
