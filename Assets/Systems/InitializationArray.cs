@@ -1,41 +1,44 @@
 using UnityEngine;
+using System;
 
 public class InitializationArray : ISystem{
     public string Name => "InitializationArray";
     private bool _initialized = false;
+    private ComponentDatabaseArray _componentDatabase;
     
-    [SerializeField] // Make it visible (Like a global variable)
-    public ComponentDatabaseArray componentDatabase;
+    //[SerializeField] // Make it visible (Like a global variable)
+    //public ComponentDatabaseArray componentDatabase;
     
-    public InitializationArray() {
-        if (componentDatabase == null) {
-            componentDatabase = new ComponentDatabaseArray();
-        }
+    public InitializationArray(ComponentDatabaseArray componentDatabase) {
+        _componentDatabase = componentDatabase;
     }
     
     public void UpdateSystem(){
         if (_initialized)
             return;
-            
+        _componentDatabase.startTime = (((DateTime.UtcNow.Hour * 60 
+                                        + DateTime.UtcNow.Minute) * 60 
+                                        + DateTime.UtcNow.Second) * 1000  
+                                        + DateTime.UtcNow.Millisecond);
         var ecsController = ECSController.Instance;
         foreach (var shapeConfig in ecsController.Config.circleInstancesToSpawn)
         {
-            uint id = componentDatabase.entitiesCounter;
+            uint id = _componentDatabase.entitiesCounter;
 
-            componentDatabase.UpdatePositionComponent(id, shapeConfig.initialPosition);
-            componentDatabase.UpdateVelocityComponent(id, shapeConfig.initialVelocity);
-            componentDatabase.UpdateSizeComponent(id, shapeConfig.initialSize);
+            _componentDatabase.UpdatePositionComponent(id, shapeConfig.initialPosition);
+            _componentDatabase.UpdateVelocityComponent(id, shapeConfig.initialVelocity);
+            _componentDatabase.UpdateSizeComponent(id, shapeConfig.initialSize);
 
-            if (componentDatabase.velocityComponents[id].Velocity == Vector2.zero){
-                componentDatabase.UpdateIsStatic(id);
-                componentDatabase.UpdateIsImmortal(id, true);
+            if (_componentDatabase.velocityComponents[id].Velocity == Vector2.zero){
+                _componentDatabase.UpdateIsStatic(id);
+                _componentDatabase.UpdateIsImmortal(id, true);
             }
-            if (componentDatabase.sizeComponents[id].Size == ecsController.Config.protectionSize)
+            if (_componentDatabase.sizeComponents[id].Size == ecsController.Config.protectionSize)
             {
-                componentDatabase.UpdateIsProtectable(id, 0);
+                _componentDatabase.UpdateIsProtectable(id, 0);
             }
-            ecsController.CreateShape(id, componentDatabase.sizeComponents[id].Size);
-            componentDatabase.entitiesCounter++;
+            ecsController.CreateShape(id, _componentDatabase.sizeComponents[id].Size);
+            _componentDatabase.entitiesCounter++;
         }
         _initialized = true;
     }

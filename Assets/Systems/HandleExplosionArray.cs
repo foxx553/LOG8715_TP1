@@ -13,8 +13,8 @@ public class HandleExplosionArray : ISystem{
     public void UpdateSystem(){
 
         var ecsController = ECSController.Instance;
-        var newSize = (int) Math.Ceiling(ecsController.Config.explosionSize / 4.0);
-        var newPositionOffset = (float) (newSize / 1.9); // Instead of 2.0, to prevent unwanted collision
+        float newPositionOffset;
+        int newSize;
 
         for (uint id = 0; id < _componentDatabase.entitiesCounter; id ++){
 
@@ -30,6 +30,8 @@ public class HandleExplosionArray : ISystem{
             if (_componentDatabase.positionComponents[id].Position.x > 0f ////
                 && ((_componentDatabase.frameCounter % 4) != 0)) continue;
 
+            newSize = (int) Math.Ceiling(_componentDatabase.sizeComponents[id].Size / 4.0);
+            newPositionOffset = (float) (newSize / 1.9); // Instead of 2.0, to prevent unwanted collision
             var currentPosition = _componentDatabase.positionComponents[id].Position;
             var currentVelocityMagnitude = _componentDatabase.velocityComponents[id].Velocity.magnitude;
             var newVelocityOffset = currentVelocityMagnitude / Math.Sqrt(2.0);

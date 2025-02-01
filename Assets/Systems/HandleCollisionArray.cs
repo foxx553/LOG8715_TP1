@@ -30,6 +30,9 @@ public class HandleCollisionArray : ISystem
 
             if (_componentDatabase.velocityComponents[id1] == null) continue;
 
+            // initialize the collision flag to null for each circles
+            _componentDatabase.isCollidings[id1] = null;
+
             Vector2 velocity1 = _componentDatabase.velocityComponents[id1].Velocity;
             float size1 = _componentDatabase.sizeComponents[id1].Size;
 

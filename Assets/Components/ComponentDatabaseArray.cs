@@ -4,12 +4,13 @@ using System.Collections.Generic;
 [System.Serializable]
 public class ComponentDatabaseArray
 {
-    public float startTime = 0f;
+    public long startTime = 0;
     public float totalTime = 0f;
+    public float deltaTime = 1f/30f;
     public uint frameCounter = 1;
     public uint entitiesCounter = 0;
     
-    private const int InitialSize = 1000;
+    private const int InitialSize = 100;
     private int capacity = InitialSize;
 
     public List<uint> availableIds = new();

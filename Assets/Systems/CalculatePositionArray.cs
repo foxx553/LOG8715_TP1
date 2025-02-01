@@ -20,8 +20,7 @@ public class CalculatePositionArray : ISystem {
 
             if (velocity == null) continue;
 
-            _componentDatabase.positionComponents[id].Position += velocity * (4*Time.deltaTime);
-
+            _componentDatabase.positionComponents[id].Position += velocity * (_componentDatabase.deltaTime);
         }
     }
 }
