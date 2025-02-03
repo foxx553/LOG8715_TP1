@@ -135,19 +135,19 @@ public class HandleCollisionArray : ISystem
                 }
                 if (!deltaSizes.ContainsKey(id2))
                 {
-                        deltaSizes[id2] = 0;
+                    deltaSizes[id2] = 0;
                 }
 
-                if (size1 == size2 && size1 <= ecsController.Config.protectionSize)
-                {
-                    if (_componentDatabase.isProtectables[id1] != null){
-                        if (_componentDatabase.isProtectables[id1].ProtectionCount < ecsController.Config.protectionCollisionCount)
-                        _componentDatabase.isProtectables[id1].ProtectionCount++;
+                if (_componentDatabase.isProtecteds[id1] != null && _componentDatabase.isProtecteds[id2] != null) {
+                    // do nothing
+                } else if (_componentDatabase.isProtecteds[id1] != null) {
+                    if (size2 > size1) {
+                        deltaSizes[id2]--;
                     }
-                    if (_componentDatabase.isProtectables[id2] != null){
-                        if (_componentDatabase.isProtectables[id2].ProtectionCount < ecsController.Config.protectionCollisionCount)
-                        _componentDatabase.isProtectables[id2].ProtectionCount++;
-                    }  
+                } else if (_componentDatabase.isProtecteds[id2] != null) {
+                    if (size1 > size2) {
+                        deltaSizes[id1]--;
+                    }
                 }
                 else if (size1 > size2)
                 {
@@ -158,6 +158,17 @@ public class HandleCollisionArray : ISystem
                 {
                     deltaSizes[id1]--;
                     deltaSizes[id2]++;
+                }
+                
+
+                if (size1 == size2)
+                {
+                    if (_componentDatabase.isProtectables[id1] != null){
+                        _componentDatabase.isProtectables[id1].ProtectionCount++;
+                    }
+                    if (_componentDatabase.isProtectables[id2] != null){
+                        _componentDatabase.isProtectables[id2].ProtectionCount++;
+                    }  
                 }
             }
         }

@@ -82,6 +82,13 @@ public class ComponentDatabaseArray
         EnsureCapacity(id);
         isProtecteds[id] = new IsProtected { DeltaTime = deltaTime };
     }
+
+    public void UpdateCooldown(uint id, float deltaTime)
+    {
+        EnsureCapacity(id);
+        cooldownComponents[id] = new CooldownComponent { DeltaTime = deltaTime };
+    }
+
     public void DestroyId(uint id)
     {
         if (id < capacity)
@@ -92,6 +99,7 @@ public class ComponentDatabaseArray
             isImmortals[id] = null;
             isProtectables[id] = null;
             isProtecteds[id] = null;
+            cooldownComponents[id] = null;
         }
     }
 }

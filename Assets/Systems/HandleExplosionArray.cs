@@ -6,6 +6,8 @@ public class HandleExplosionArray : ISystem{
     public string Name => "HandleExplosionArray";
     private ComponentDatabaseArray _componentDatabase;
 
+    public System.Random random = new();
+
     public HandleExplosionArray(ComponentDatabaseArray componentDatabase) {
         _componentDatabase = componentDatabase;
     }
@@ -34,13 +36,10 @@ public class HandleExplosionArray : ISystem{
             newPositionOffset = (float) (newSize / 1.9); // Instead of 2.0, to prevent unwanted collision
             var currentPosition = _componentDatabase.positionComponents[id].Position;
             var currentVelocityMagnitude = _componentDatabase.velocityComponents[id].Velocity.magnitude;
-            var newVelocityOffset = currentVelocityMagnitude / Math.Sqrt(2.0);
+            var newVelocityOffset = currentVelocityMagnitude; // / Math.Sqrt(2.0);
 
             Vector2 positionDelta1 = new Vector2(newPositionOffset, newPositionOffset);
             Vector2 positionDelta2 = new Vector2(- newPositionOffset, newPositionOffset);
-
-            Vector2 velocityDelta1 = new Vector2((float) newVelocityOffset, (float) newVelocityOffset);
-            Vector2 velocityDelta2 = new Vector2((float) -newVelocityOffset, (float) newVelocityOffset);
 
             _componentDatabase.sizeComponents[id].Size = 0;
 
@@ -49,10 +48,14 @@ public class HandleExplosionArray : ISystem{
             newPositions.Add(currentPosition + positionDelta2);
             newPositions.Add(currentPosition - positionDelta2);
 
-            newVelocities.Add(velocityDelta1);
-            newVelocities.Add(-velocityDelta1);
-            newVelocities.Add(velocityDelta2);
-            newVelocities.Add(-velocityDelta2);
+            var finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
+            newVelocities.Add(new Vector2((float) finalVelocity, (float) finalVelocity));
+            finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
+            newVelocities.Add(new Vector2((float) finalVelocity, (float) -finalVelocity));
+            finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
+            newVelocities.Add(new Vector2((float) -finalVelocity, (float) finalVelocity));
+            finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
+            newVelocities.Add(new Vector2((float) -finalVelocity, (float) -finalVelocity));
 
             for (int i = 0; i < 4; i++){
                 int n = _componentDatabase.availableIds.Count;
@@ -71,7 +74,7 @@ public class HandleExplosionArray : ISystem{
                 _componentDatabase.UpdateVelocityComponent(newId, newVelocities[i]);
                 ecsController.CreateShape(newId, newSize);
 
-                if (newSize == ecsController.Config.protectionSize)
+                if (newSize <= ecsController.Config.protectionSize)
                     _componentDatabase.UpdateIsProtectable(newId, 0);
             }
         }

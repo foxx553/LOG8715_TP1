@@ -17,8 +17,9 @@ public class RegisterSystems
         var updateSize = new UpdateSizeArray(componentDatabase);
         var handleExplosion = new HandleExplosionArray(componentDatabase);
         var updateColor = new UpdateColorArray(componentDatabase);
-        var handleTime = new HandleTimeArray(componentDatabase);
+        var handleProtection = new HandleProtectionArray(componentDatabase);
         var handleCooldown = new HandleCooldownArray(componentDatabase);
+        var handleTime = new HandleTimeArray(componentDatabase);
 
         toRegister.Add(initialization);
         toRegister.Add(calculatePosition);
@@ -27,6 +28,7 @@ public class RegisterSystems
         toRegister.Add(updateSize);
         toRegister.Add(updatePosition);
         toRegister.Add(updateColor);
+        toRegister.Add(handleProtection);
         toRegister.Add(handleCooldown);
         toRegister.Add(handleTime);
         return toRegister;

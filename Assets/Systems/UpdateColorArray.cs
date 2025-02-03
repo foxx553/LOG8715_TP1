@@ -19,24 +19,28 @@ public class UpdateColorArray : ISystem
                 && ((_componentDatabase.frameCounter % 4) != 0)) continue;
 
             if (_componentDatabase.isStatics[id] != null){
-                ecsController.UpdateShapeColor(id, UnityEngine.Color.red);
+                ecsController.UpdateShapeColor(id, Color.red);
             }
             else if (_componentDatabase.isCollidings[id] != null)
             {
-                ecsController.UpdateShapeColor(id, UnityEngine.Color.green);
+                ecsController.UpdateShapeColor(id, Color.green);
                 _componentDatabase.isCollidings[id] = null;
             }
             else if (_componentDatabase.isProtecteds[id] != null)
             {
-                ecsController.UpdateShapeColor(id, UnityEngine.Color.white);
+                ecsController.UpdateShapeColor(id, Color.white);
             }
             else if (_componentDatabase.isProtectables[id] != null)
             {
-                ecsController.UpdateShapeColor(id, UnityEngine.Color.cyan);
+                ecsController.UpdateShapeColor(id, Color.cyan);
+            }
+            else if (_componentDatabase.cooldownComponents[id] != null)
+            {
+                ecsController.UpdateShapeColor(id, Color.yellow);
             }
             else
             {
-                ecsController.UpdateShapeColor(id, UnityEngine.Color.blue);
+                ecsController.UpdateShapeColor(id, Color.blue);
             }
 
         }
