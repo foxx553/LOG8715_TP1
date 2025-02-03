@@ -61,11 +61,11 @@ public class HandleMouseClick : ISystem
                         var finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
                         newVelocities.Add(new Vector2((float) finalVelocity, (float) finalVelocity));
                         finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
-                        newVelocities.Add(new Vector2((float) finalVelocity, (float) -finalVelocity));
+                        newVelocities.Add(new Vector2((float) -finalVelocity, (float) -finalVelocity));
                         finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
                         newVelocities.Add(new Vector2((float) -finalVelocity, (float) finalVelocity));
                         finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
-                        newVelocities.Add(new Vector2((float) -finalVelocity, (float) -finalVelocity));
+                        newVelocities.Add(new Vector2((float) finalVelocity, (float) -finalVelocity));
                         
                         explodedCircle = true;
                     }

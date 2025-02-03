@@ -13,29 +13,23 @@ MonoBehaviour:
   m_Name: Config
   m_EditorClassIdentifier: 
   explosionSize: 8
-  protectionSize: 2
+  protectionSize: 4
   protectionCollisionCount: 3
   protectionDuration: 5
   protectionCooldown: 15
   circleInstancesToSpawn:
-  - initialSize: 5
+  - initialSize: 8
     initialPosition: {x: -10, y: -10}
-    initialVelocity: {x: 0, y: 0}
-  - initialSize: 4
-    initialPosition: {x: 2, y: 2}
-    initialVelocity: {x: 30, y: -15}
-  - initialSize: 2
-    initialPosition: {x: -20, y: -20}
-    initialVelocity: {x: 2, y: -5}
-  - initialSize: 3
-    initialPosition: {x: 30, y: 0}
-    initialVelocity: {x: 5, y: 0}
-  - initialSize: 7
-    initialPosition: {x: -15, y: -15}
+    initialVelocity: {x: 1, y: 0}
+  - initialSize: 12
+    initialPosition: {x: 0, y: -10}
     initialVelocity: {x: 5, y: 5}
-  - initialSize: 2
-    initialPosition: {x: -5, y: 0}
-    initialVelocity: {x: 40, y: -10}
+  - initialSize: 3
+    initialPosition: {x: 0, y: 0}
+    initialVelocity: {x: 2, y: -5}
+  - initialSize: 5
+    initialPosition: {x: 10, y: 0}
+    initialVelocity: {x: -3, y: -5}
   systemsEnabled:
     keys:
     - Initialization
@@ -44,4 +38,15 @@ MonoBehaviour:
     - UpdatePosition
     - UpdateSize
     - HandleExplosion
-    values: 010101010101
+    - InitializationArray
+    - CalculatePositionArray
+    - HandleCollisionArray
+    - HandleExplosionArray
+    - UpdateSizeArray
+    - UpdatePositionArray
+    - UpdateColorArray
+    - HandleCooldownArray
+    - HandleTimeArray
+    - HandleProtectionArray
+    - HandleMouseClick
+    values: 0101010101010101010101010101010101

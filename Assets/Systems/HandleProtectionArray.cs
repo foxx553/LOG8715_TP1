@@ -25,7 +25,7 @@ public class HandleProtectionArray : ISystem
             else if (_componentDatabase.isProtectables[id] == null) {
                 _componentDatabase.UpdateIsProtectable(id, 0);
             }
-            else if (_componentDatabase.isProtectables[id].ProtectionCount == ecsController.Config.protectionCollisionCount) {
+            else if (_componentDatabase.isProtectables[id].ProtectionCount >= ecsController.Config.protectionCollisionCount) {
                 _componentDatabase.isProtectables[id] = null;
                 _componentDatabase.UpdateIsProtected(id, ecsController.Config.protectionDuration);
             }

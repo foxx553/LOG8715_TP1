@@ -51,11 +51,11 @@ public class HandleExplosionArray : ISystem{
             var finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
             newVelocities.Add(new Vector2((float) finalVelocity, (float) finalVelocity));
             finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
-            newVelocities.Add(new Vector2((float) finalVelocity, (float) -finalVelocity));
+            newVelocities.Add(new Vector2((float) -finalVelocity, (float) -finalVelocity));
             finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
             newVelocities.Add(new Vector2((float) -finalVelocity, (float) finalVelocity));
             finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
-            newVelocities.Add(new Vector2((float) -finalVelocity, (float) -finalVelocity));
+            newVelocities.Add(new Vector2((float) finalVelocity, (float) -finalVelocity));
 
             for (int i = 0; i < 4; i++){
                 int n = _componentDatabase.availableIds.Count;
