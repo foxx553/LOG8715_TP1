@@ -21,6 +21,11 @@ public class UpdateColorArray : ISystem
             if (_componentDatabase.isStatics[id] != null){
                 ecsController.UpdateShapeColor(id, Color.red);
             }
+            else if (_componentDatabase.isExplodeds[id] != null)
+            {
+                ecsController.UpdateShapeColor(id, Color.magenta);
+                _componentDatabase.isExplodeds[id] = null;
+            }
             else if (_componentDatabase.isCollidings[id] != null)
             {
                 ecsController.UpdateShapeColor(id, Color.green);

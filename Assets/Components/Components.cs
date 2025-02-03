@@ -33,3 +33,5 @@ public class CooldownComponent : IComponent
 }
 
 public class IsColliding : IComponent { }
+
+public class IsExploded : IComponent { }

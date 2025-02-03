@@ -72,6 +72,7 @@ public class HandleExplosionArray : ISystem{
                 _componentDatabase.UpdateSizeComponent(newId, newSize);
                 _componentDatabase.UpdatePositionComponent(newId, newPositions[i]);
                 _componentDatabase.UpdateVelocityComponent(newId, newVelocities[i]);
+                _componentDatabase.UpdateIsExploded(newId, true);
                 ecsController.CreateShape(newId, newSize);
 
                 if (newSize <= ecsController.Config.protectionSize)

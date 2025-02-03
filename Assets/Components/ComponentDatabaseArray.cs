@@ -20,6 +20,8 @@ public class ComponentDatabaseArray
     public IsStatic[] isStatics = new IsStatic[InitialSize];
     public IsImmortal[] isImmortals = new IsImmortal[InitialSize];
     public IsColliding[] isCollidings = new IsColliding[InitialSize];
+
+    public IsExploded[] isExplodeds = new IsExploded[InitialSize];
     public IsProtectable[] isProtectables = new IsProtectable[InitialSize];
     public IsProtected[] isProtecteds = new IsProtected[InitialSize];
     public CooldownComponent[] cooldownComponents = new CooldownComponent[InitialSize];
@@ -37,6 +39,7 @@ public class ComponentDatabaseArray
             System.Array.Resize(ref isCollidings, newCapacity);
             System.Array.Resize(ref isProtectables, newCapacity);
             System.Array.Resize(ref isProtecteds, newCapacity);
+            System.Array.Resize(ref isExplodeds, newCapacity);
             System.Array.Resize(ref cooldownComponents, newCapacity);
             capacity = newCapacity;
         }
@@ -71,6 +74,11 @@ public class ComponentDatabaseArray
     {
         EnsureCapacity(id);
         isCollidings[id] = isColliding ? new IsColliding() : null;
+    }
+    public void UpdateIsExploded(uint id, bool isExploded)
+    {
+        EnsureCapacity(id);
+        isExplodeds[id] = isExploded ? new IsExploded() : null;
     }
     public void UpdateIsProtectable(uint id, int protectionCount)
     {
