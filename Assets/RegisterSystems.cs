@@ -16,6 +16,7 @@ public class RegisterSystems
         var handleCollision = new HandleCollisionArray(componentDatabase);
         var updateSize = new UpdateSizeArray(componentDatabase);
         var handleExplosion = new HandleExplosionArray(componentDatabase);
+        var handleMouseClick = new HandleMouseClick(componentDatabase);
         var updateColor = new UpdateColorArray(componentDatabase);
         var handleProtection = new HandleProtectionArray(componentDatabase);
         var handleCooldown = new HandleCooldownArray(componentDatabase);
@@ -25,6 +26,7 @@ public class RegisterSystems
         toRegister.Add(calculatePosition);
         toRegister.Add(handleCollision);
         toRegister.Add(handleExplosion);
+        toRegister.Add(handleMouseClick);
         toRegister.Add(updateSize);
         toRegister.Add(updatePosition);
         toRegister.Add(updateColor);
