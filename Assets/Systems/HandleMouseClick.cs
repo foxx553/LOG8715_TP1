@@ -23,6 +23,8 @@ public class HandleMouseClick : ISystem
             for (uint id = 0; id < _componentDatabase.entitiesCounter; id ++) {
                 if (_componentDatabase.positionComponents[id] == null) continue;
 
+                if (_componentDatabase.isStatics[id] != null) continue;
+
                 var currentCenter = _componentDatabase.positionComponents[id].Position;
                 var currentSize = _componentDatabase.sizeComponents[id].Size;
                 var distanceToCenter = Math.Pow(currentCenter.x - mouse2DScreenPosition.x, 2) + Math.Pow(currentCenter.y - mouse2DScreenPosition.y, 2);
