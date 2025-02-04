@@ -26,14 +26,14 @@ public class UpdateColorArray : ISystem
                 ecsController.UpdateShapeColor(id, Color.magenta);
                 _componentDatabase.isExplodeds[id] = null;
             }
-            else if (_componentDatabase.sizeComponents[id].Size >= ecsController.Config.explosionSize - 1)
-            {
-                ecsController.UpdateShapeColor(id, new Color(1.0f, 0.5f, 0.0f));
-            }
             else if (_componentDatabase.isCollidings[id] != null)
             {
                 ecsController.UpdateShapeColor(id, Color.green);
                 _componentDatabase.isCollidings[id] = null;
+            }
+            else if (_componentDatabase.sizeComponents[id].Size >= ecsController.Config.explosionSize - 1)
+            {
+                ecsController.UpdateShapeColor(id, new Color(1.0f, 0.5f, 0.0f));
             }
             else if (_componentDatabase.isProtecteds[id] != null)
             {
