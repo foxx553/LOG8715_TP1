@@ -1,8 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 [System.Serializable]
-public class ComponentDatabaseArray
+public class ComponentDatabaseArray : System.ICloneable
 {
     public long startTime = 0;
     public float totalTime = 0f;
@@ -109,5 +110,90 @@ public class ComponentDatabaseArray
             isProtecteds[id] = null;
             cooldownComponents[id] = null;
         }
+    }
+
+    public void ApplySave(ComponentDatabaseArray save) {
+        this.startTime = save.startTime;
+        this.totalTime = save.totalTime;
+        this.deltaTime = save.deltaTime;
+        this.frameCounter = save.frameCounter;
+        this.entitiesCounter = save.entitiesCounter;
+        this.capacity = save.capacity;
+        this.availableIds = save.availableIds;
+
+        this.positionComponents = save.positionComponents;
+        this.velocityComponents = save.velocityComponents;
+        this.sizeComponents = save.sizeComponents;
+        this.isStatics = save.isStatics;
+        this.isImmortals = save.isImmortals;
+        this.isCollidings = save.isCollidings;
+        this.isExplodeds = save.isExplodeds;
+        this.isProtectables = save.isProtectables;
+        this.isProtecteds = save.isProtecteds;
+        this.cooldownComponents = save.cooldownComponents;
+    }
+
+    public object Clone()
+    {
+        ComponentDatabaseArray clonedInstance = new();
+        clonedInstance.startTime = this.startTime;
+        clonedInstance.totalTime = this.totalTime;
+        clonedInstance.deltaTime = this.deltaTime;
+        clonedInstance.frameCounter = this.frameCounter;
+        clonedInstance.entitiesCounter = this.entitiesCounter;
+        clonedInstance.capacity = this.capacity;
+        clonedInstance.availableIds = new List<uint>(this.availableIds);
+
+        for (int i = 0; i < this.positionComponents.Length; i++) {
+            if (this.positionComponents[i] != null)
+                clonedInstance.positionComponents[i] = (PositionComponent) this.positionComponents[i].Clone();
+        }
+
+        for (int i = 0; i < this.velocityComponents.Length; i++) {
+            if (this.velocityComponents[i] != null)
+                clonedInstance.velocityComponents[i] = (VelocityComponent) this.velocityComponents[i].Clone();
+        }
+
+        for (int i = 0; i < this.sizeComponents.Length; i++) {
+            if (this.sizeComponents[i] != null)
+                clonedInstance.sizeComponents[i] = (SizeComponent) this.sizeComponents[i].Clone();
+        }
+
+        for (int i = 0; i < this.isStatics.Length; i++) {
+            if (this.isStatics[i] != null)
+                clonedInstance.isStatics[i] = (IsStatic) this.isStatics[i].Clone();
+        }
+
+        for (int i = 0; i < this.isImmortals.Length; i++) {
+            if (this.isImmortals[i] != null)
+                clonedInstance.isImmortals[i] = (IsImmortal) this.isImmortals[i].Clone();
+        }
+
+        for (int i = 0; i < this.isCollidings.Length; i++) {
+            if (this.isCollidings[i] != null)
+                clonedInstance.isCollidings[i] = (IsColliding) this.isCollidings[i].Clone();
+        }
+
+        for (int i = 0; i < this.isExplodeds.Length; i++) {
+            if (this.isExplodeds[i] != null)
+                clonedInstance.isExplodeds[i] = (IsExploded) this.isExplodeds[i].Clone();
+        }
+
+        for (int i = 0; i < this.isProtectables.Length; i++) {
+            if (this.isProtectables[i] != null)
+                clonedInstance.isProtectables[i] = (IsProtectable) this.isProtectables[i].Clone();
+        }
+
+        for (int i = 0; i < this.isProtecteds.Length; i++) {
+            if (this.isProtecteds[i] != null)
+                clonedInstance.isProtecteds[i] = (IsProtected) this.isProtecteds[i].Clone();
+        }
+
+        for (int i = 0; i < this.cooldownComponents.Length; i++) {
+            if (this.cooldownComponents[i] != null)
+                clonedInstance.cooldownComponents[i] = (CooldownComponent) this.cooldownComponents[i].Clone();
+        }
+
+        return clonedInstance;
     }
 }

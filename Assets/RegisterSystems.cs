@@ -7,8 +7,7 @@ public class RegisterSystems
         // determine order of systems to add
         var toRegister = new List<ISystem>();
         var componentDatabase = new ComponentDatabaseArray();
-        var oldComponentDatabase = new ComponentDatabaseArray();
-        var interComponentDatabase = new ComponentDatabaseArray();
+        var componentHistory = new ComponentHistoryArray();
         // Add your systems here
         var initialization = new InitializationArray(componentDatabase);
         var calculatePosition = new CalculatePositionArray(componentDatabase);
@@ -21,6 +20,7 @@ public class RegisterSystems
         var handleProtection = new HandleProtectionArray(componentDatabase);
         var handleCooldown = new HandleCooldownArray(componentDatabase);
         var handleTime = new HandleTimeArray(componentDatabase);
+        var handleSave = new HandleSave(componentDatabase, componentHistory);
 
         toRegister.Add(initialization);
         toRegister.Add(calculatePosition);
@@ -33,6 +33,7 @@ public class RegisterSystems
         toRegister.Add(handleProtection);
         toRegister.Add(handleCooldown);
         toRegister.Add(handleTime);
+        toRegister.Add(handleSave);
         return toRegister;
     }
 }
