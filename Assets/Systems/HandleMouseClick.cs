@@ -6,7 +6,6 @@ public class HandleMouseClick : ISystem
 {
     public string Name => "HandleMouseClick";
     private ComponentDatabaseArray _componentDatabase;
-    public System.Random random = new();
 
     public HandleMouseClick(ComponentDatabaseArray componentDatabase)
     {
@@ -46,7 +45,7 @@ public class HandleMouseClick : ISystem
                         var newPositionOffset = (float) (newSize / 1.9); // Instead of 2.0, to prevent unwanted collision
                         var currentPosition = _componentDatabase.positionComponents[id].Position;
                         var currentVelocityMagnitude = _componentDatabase.velocityComponents[id].Velocity.magnitude;
-                        var newVelocityOffset = currentVelocityMagnitude; // / Math.Sqrt(2.0);
+                        var newVelocityOffset = currentVelocityMagnitude / Math.Sqrt(2.0);
 
                         Vector2 positionDelta1 = new Vector2(newPositionOffset, newPositionOffset);
                         Vector2 positionDelta2 = new Vector2(- newPositionOffset, newPositionOffset);
@@ -58,14 +57,10 @@ public class HandleMouseClick : ISystem
                         newPositions.Add(currentPosition + positionDelta2);
                         newPositions.Add(currentPosition - positionDelta2);
 
-                        var finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
-                        newVelocities.Add(new Vector2((float) finalVelocity, (float) finalVelocity));
-                        finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
-                        newVelocities.Add(new Vector2((float) -finalVelocity, (float) -finalVelocity));
-                        finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
-                        newVelocities.Add(new Vector2((float) -finalVelocity, (float) finalVelocity));
-                        finalVelocity = newVelocityOffset * (0.5 + random.NextDouble());
-                        newVelocities.Add(new Vector2((float) finalVelocity, (float) -finalVelocity));
+                        newVelocities.Add(new Vector2((float) newVelocityOffset, (float) newVelocityOffset));
+                        newVelocities.Add(new Vector2((float) -newVelocityOffset, (float) -newVelocityOffset));
+                        newVelocities.Add(new Vector2((float) -newVelocityOffset, (float) newVelocityOffset));
+                        newVelocities.Add(new Vector2((float) newVelocityOffset, (float) -newVelocityOffset));
                         
                         explodedCircle = true;
                     }
