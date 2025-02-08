@@ -36,11 +36,11 @@ public class HandleMouseClick : ISystem
 
                 if (distanceToCenter <= Math.Pow(currentSize, 2)) {
                     if (currentSize < 4) {
-                        ecsController.DestroyShape(id);
-                        _componentDatabase.DestroyId(id);
-                        _componentDatabase.availableIds.Add(id);
+                        // Will be destroyed later in the tick by UpdateSize system
+                        _componentDatabase.sizeComponents[id].Size = 0; 
                     } else {
 
+                        // Futur update: refactor this explosion code into a static public function //
                         newSize = (int) Math.Ceiling(_componentDatabase.sizeComponents[id].Size / 4.0);
                         var newPositionOffset = (float) (newSize / 1.9); // Instead of 2.0, to prevent unwanted collision
                         var currentPosition = _componentDatabase.positionComponents[id].Position;
@@ -61,6 +61,7 @@ public class HandleMouseClick : ISystem
                         newVelocities.Add(new Vector2((float) -newVelocityOffset, (float) -newVelocityOffset));
                         newVelocities.Add(new Vector2((float) -newVelocityOffset, (float) newVelocityOffset));
                         newVelocities.Add(new Vector2((float) newVelocityOffset, (float) -newVelocityOffset));
+                        //////////////////////////////////////////////////////////////////////////////
                         
                         explodedCircle = true;
                     }

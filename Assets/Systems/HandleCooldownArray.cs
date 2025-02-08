@@ -1,6 +1,3 @@
-using UnityEngine;
-using System.Collections.Generic;
-
 public class HandleCooldownArray : ISystem
 {
     public string Name => "HandleCooldownArray";

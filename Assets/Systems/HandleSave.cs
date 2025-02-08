@@ -1,7 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
-using System.Threading;
-using System;
 
 public class HandleSave : ISystem {
     public string Name => "HandleSave";
@@ -18,14 +15,14 @@ public class HandleSave : ISystem {
     public void UpdateSystem(){
 
         bool saveRequested = false;
-        if (Input.GetKey(KeyCode.Space) && CooldownCounter == 0) {
+        if (Input.GetKeyDown(KeyCode.Space) && CooldownCounter == 0) {
             saveRequested = true;
-            Debug.Log("SPACE!!!");
             CooldownCounter++;
         } else if (CooldownCounter > 0 && CooldownCounter < COOLDOWN_THRESHOLD) {
             CooldownCounter++;
+            if (Input.GetKeyDown(KeyCode.Space))
+                Debug.Log("Rewind permission denied! Cooldown not over");
         } else if (CooldownCounter >= COOLDOWN_THRESHOLD) {
-            Debug.Log("Delay over!");
             CooldownCounter = 0;
         }
 

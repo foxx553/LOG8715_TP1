@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class UpdatePositionArray : ISystem {
     public string Name => "UpdatePositionArray";
     private ComponentDatabaseArray _componentDatabase;

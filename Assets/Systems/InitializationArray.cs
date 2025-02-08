@@ -6,9 +6,6 @@ public class InitializationArray : ISystem{
     private bool _initialized = false;
     private ComponentDatabaseArray _componentDatabase;
     
-    //[SerializeField] // Make it visible (Like a global variable)
-    //public ComponentDatabaseArray componentDatabase;
-    
     public InitializationArray(ComponentDatabaseArray componentDatabase) {
         _componentDatabase = componentDatabase;
     }
@@ -16,10 +13,10 @@ public class InitializationArray : ISystem{
     public void UpdateSystem(){
         if (_initialized)
             return;
-        _componentDatabase.startTime = (((DateTime.UtcNow.Hour * 60 
+        _componentDatabase.startTime = ((DateTime.UtcNow.Hour * 60 
                                         + DateTime.UtcNow.Minute) * 60 
                                         + DateTime.UtcNow.Second) * 1000  
-                                        + DateTime.UtcNow.Millisecond);
+                                        + DateTime.UtcNow.Millisecond;
         var ecsController = ECSController.Instance;
         foreach (var shapeConfig in ecsController.Config.circleInstancesToSpawn)
         {

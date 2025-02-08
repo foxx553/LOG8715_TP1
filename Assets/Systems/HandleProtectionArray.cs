@@ -1,6 +1,3 @@
-using UnityEngine;
-using System.Collections.Generic;
-
 public class HandleProtectionArray : ISystem
 {
     public string Name => "HandleProtectionArray";

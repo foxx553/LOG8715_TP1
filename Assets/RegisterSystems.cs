@@ -27,13 +27,15 @@ public class RegisterSystems
         toRegister.Add(handleCollision);
         toRegister.Add(handleExplosion);
         toRegister.Add(handleMouseClick);
+        toRegister.Add(handleProtection);
+        toRegister.Add(handleCooldown);
+        toRegister.Add(handleSave);
+
         toRegister.Add(updateSize);
         toRegister.Add(updatePosition);
         toRegister.Add(updateColor);
-        toRegister.Add(handleProtection);
-        toRegister.Add(handleCooldown);
+        
         toRegister.Add(handleTime);
-        toRegister.Add(handleSave);
         return toRegister;
     }
 }

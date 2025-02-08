@@ -18,18 +18,21 @@ MonoBehaviour:
   protectionDuration: 5
   protectionCooldown: 15
   circleInstancesToSpawn:
-  - initialSize: 8
+  - initialSize: 5
     initialPosition: {x: -10, y: -10}
     initialVelocity: {x: 1, y: 0}
-  - initialSize: 12
+  - initialSize: 7
     initialPosition: {x: 0, y: -10}
     initialVelocity: {x: 5, y: 5}
-  - initialSize: 3
+  - initialSize: 12
     initialPosition: {x: 0, y: 0}
-    initialVelocity: {x: 2, y: -5}
-  - initialSize: 5
-    initialPosition: {x: 10, y: 0}
-    initialVelocity: {x: -3, y: -5}
+    initialVelocity: {x: -10, y: 2}
+  - initialSize: 3
+    initialPosition: {x: 5, y: 0}
+    initialVelocity: {x: 2, y: 2}
+  - initialSize: 1
+    initialPosition: {x: 5, y: 5}
+    initialVelocity: {x: 6, y: -9}
   systemsEnabled:
     keys:
     - Initialization
@@ -49,4 +52,5 @@ MonoBehaviour:
     - HandleTimeArray
     - HandleProtectionArray
     - HandleMouseClick
-    values: 0101010101010101010101010101010101
+    - HandleSave
+    values: 010101010101010101010101010101010101

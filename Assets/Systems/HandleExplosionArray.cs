@@ -30,6 +30,7 @@ public class HandleExplosionArray : ISystem{
             if (_componentDatabase.positionComponents[id].Position.x > 0f ////
                 && ((_componentDatabase.frameCounter % 4) != 0)) continue;
 
+            // Futur update: refactor this explosion code into a static public function //
             newSize = (int) Math.Ceiling(_componentDatabase.sizeComponents[id].Size / 4.0);
             newPositionOffset = (float) (newSize / 1.9); // Instead of 2.0, to prevent unwanted collision
             var currentPosition = _componentDatabase.positionComponents[id].Position;
@@ -45,11 +46,12 @@ public class HandleExplosionArray : ISystem{
             newPositions.Add(currentPosition - positionDelta1);
             newPositions.Add(currentPosition + positionDelta2);
             newPositions.Add(currentPosition - positionDelta2);
-;
+
             newVelocities.Add(new Vector2((float) newVelocityOffset, (float) newVelocityOffset));
             newVelocities.Add(new Vector2((float) -newVelocityOffset, (float) -newVelocityOffset));
             newVelocities.Add(new Vector2((float) -newVelocityOffset, (float) newVelocityOffset));
             newVelocities.Add(new Vector2((float) newVelocityOffset, (float) -newVelocityOffset));
+            //////////////////////////////////////////////////////////////////////////////
 
             for (int i = 0; i < 4; i++){
                 int n = _componentDatabase.availableIds.Count;

@@ -1,6 +1,3 @@
-using UnityEngine;
-using System.Collections.Generic;
-
 public class UpdateSizeArray : ISystem {
     public string Name => "UpdateSizeArray";
     private ComponentDatabaseArray _componentDatabase;
