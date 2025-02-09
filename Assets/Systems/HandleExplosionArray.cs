@@ -35,7 +35,7 @@ public class HandleExplosionArray : ISystem{
             newPositionOffset = (float) (newSize / 1.9); // Instead of 2.0, to prevent unwanted collision
             var currentPosition = _componentDatabase.positionComponents[id].Position;
             var currentVelocityMagnitude = _componentDatabase.velocityComponents[id].Velocity.magnitude;
-            var newVelocityOffset = currentVelocityMagnitude / Math.Sqrt(2.0);
+            var newVelocityOffset = currentVelocityMagnitude; // Instead of "/ Math.Sqrt(2.0);"
 
             Vector2 positionDelta1 = new Vector2(newPositionOffset, newPositionOffset);
             Vector2 positionDelta2 = new Vector2(- newPositionOffset, newPositionOffset);

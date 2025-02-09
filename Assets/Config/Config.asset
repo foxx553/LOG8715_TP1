@@ -24,9 +24,9 @@ MonoBehaviour:
   - initialSize: 7
     initialPosition: {x: 0, y: -10}
     initialVelocity: {x: 5, y: 5}
-  - initialSize: 12
+  - initialSize: 4
     initialPosition: {x: 0, y: 0}
-    initialVelocity: {x: -10, y: 2}
+    initialVelocity: {x: 0, y: 0}
   - initialSize: 3
     initialPosition: {x: 5, y: 0}
     initialVelocity: {x: 2, y: 2}
