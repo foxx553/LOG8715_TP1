@@ -19,7 +19,6 @@ public class HandleMouseClick : ISystem
         if (Input.GetMouseButtonDown(0)) {
             var mouse3DScreenPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             var mouse2DScreenPosition = new Vector2(mouse3DScreenPosition.x, mouse3DScreenPosition.y);
-
             List<Vector2> newPositions = new List<Vector2>();
             List<Vector2> newVelocities = new List<Vector2>();
             var newSize = 0;
@@ -74,8 +73,8 @@ public class HandleMouseClick : ISystem
                     int n = _componentDatabase.availableIds.Count;
                     uint newId;
                     if (n != 0){
-                        newId = _componentDatabase.availableIds[n - 1];
-                        _componentDatabase.availableIds.RemoveAt(n - 1);
+                        newId = _componentDatabase.availableIds[0];
+                        _componentDatabase.availableIds.RemoveAt(0);
                     }
                     else {
                         newId = _componentDatabase.entitiesCounter;
@@ -87,6 +86,7 @@ public class HandleMouseClick : ISystem
                     _componentDatabase.UpdateVelocityComponent(newId, newVelocities[i]);
                     _componentDatabase.UpdateIsExploded(newId, true);
                     ecsController.CreateShape(newId, newSize);
+                    ecsController.UpdateShapePosition(newId, newPositions[i]);
 
                     if (newSize <= ecsController.Config.protectionSize)
                         _componentDatabase.UpdateIsProtectable(newId, 0);

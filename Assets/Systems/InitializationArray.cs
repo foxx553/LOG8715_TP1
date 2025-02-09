@@ -35,6 +35,7 @@ public class InitializationArray : ISystem{
                 _componentDatabase.UpdateIsProtectable(id, 0);
             }
             ecsController.CreateShape(id, _componentDatabase.sizeComponents[id].Size);
+            ecsController.UpdateShapePosition(id, shapeConfig.initialPosition);
             _componentDatabase.entitiesCounter++;
         }
         _initialized = true;

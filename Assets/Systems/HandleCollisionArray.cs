@@ -30,9 +30,6 @@ public class HandleCollisionArray : ISystem
 
             if (_componentDatabase.velocityComponents[id1] == null) continue;
 
-            // initialize the collision flag to null for each circles
-            _componentDatabase.isCollidings[id1] = null;
-
             Vector2 velocity1 = _componentDatabase.velocityComponents[id1].Velocity;
             float size1 = _componentDatabase.sizeComponents[id1].Size;
 
@@ -104,7 +101,6 @@ public class HandleCollisionArray : ISystem
                 float radiusSum = size1 / 2 + size2 / 2;
 
                 if (distance > radiusSum) continue;
-
                 CollisionResult collisionResult = CollisionUtility.CalculateCollision(position1,
                 velocity1, size1, position2, velocity2, size2);
 
@@ -139,7 +135,7 @@ public class HandleCollisionArray : ISystem
                 }
 
                 if (_componentDatabase.isProtecteds[id1] != null && _componentDatabase.isProtecteds[id2] != null) {
-                    // do nothing
+                    continue;
                 } else if (_componentDatabase.isProtecteds[id1] != null) {
                     if (size2 > size1) {
                         deltaSizes[id2]--;
@@ -159,7 +155,6 @@ public class HandleCollisionArray : ISystem
                     deltaSizes[id1]--;
                     deltaSizes[id2]++;
                 }
-                
 
                 if (size1 == size2)
                 {

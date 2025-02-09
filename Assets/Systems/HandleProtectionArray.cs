@@ -15,6 +15,9 @@ public class HandleProtectionArray : ISystem
         for (uint id = 0; id < _componentDatabase.entitiesCounter; id++){
             if (_componentDatabase.positionComponents[id] == null) continue;
 
+            if (_componentDatabase.positionComponents[id].Position.x > 0f ////
+            && ((_componentDatabase.frameCounter % 4) != 0)) continue;
+
             if (_componentDatabase.cooldownComponents[id] != null
                 || _componentDatabase.sizeComponents[id].Size > ecsController.Config.protectionSize) {
                 _componentDatabase.isProtectables[id] = null;

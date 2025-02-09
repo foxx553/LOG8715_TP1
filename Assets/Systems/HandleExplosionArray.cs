@@ -24,11 +24,10 @@ public class HandleExplosionArray : ISystem{
             if (_componentDatabase.sizeComponents[id] == null) continue;
 
             SizeComponent sizeEntry = _componentDatabase.sizeComponents[id];
-
-            if (sizeEntry.Size < ecsController.Config.explosionSize) continue;
-
             if (_componentDatabase.positionComponents[id].Position.x > 0f ////
                 && ((_componentDatabase.frameCounter % 4) != 0)) continue;
+
+            if (sizeEntry.Size < ecsController.Config.explosionSize) continue;
 
             // Futur update: refactor this explosion code into a static public function //
             newSize = (int) Math.Ceiling(_componentDatabase.sizeComponents[id].Size / 4.0);
@@ -55,10 +54,10 @@ public class HandleExplosionArray : ISystem{
 
             for (int i = 0; i < 4; i++){
                 int n = _componentDatabase.availableIds.Count;
-                uint newId = 0;
+                uint newId;
                 if (n != 0){
-                    newId = _componentDatabase.availableIds[n - 1];
-                    _componentDatabase.availableIds.RemoveAt(n - 1);
+                    newId = _componentDatabase.availableIds[0];
+                    _componentDatabase.availableIds.RemoveAt(0);
                 }
                 else {
                     newId = _componentDatabase.entitiesCounter;
@@ -70,6 +69,7 @@ public class HandleExplosionArray : ISystem{
                 _componentDatabase.UpdateVelocityComponent(newId, newVelocities[i]);
                 _componentDatabase.UpdateIsExploded(newId, true);
                 ecsController.CreateShape(newId, newSize);
+                ecsController.UpdateShapePosition(newId, newPositions[i]);
 
                 if (newSize <= ecsController.Config.protectionSize)
                     _componentDatabase.UpdateIsProtectable(newId, 0);

@@ -5,9 +5,8 @@ using System.Collections.Generic;
 public class ComponentDatabaseArray : System.ICloneable
 {
     public long startTime = 0;
-    public float totalTime = 0f;
     public float deltaTime = 1f/30f;
-    public uint frameCounter = 1;
+    public uint frameCounter = 0;
     public uint entitiesCounter = 0;
     
     private const int InitialSize = 100;
@@ -108,12 +107,13 @@ public class ComponentDatabaseArray : System.ICloneable
             isProtectables[id] = null;
             isProtecteds[id] = null;
             cooldownComponents[id] = null;
+            isExplodeds[id] = null;
+            isCollidings[id] = null;
         }
     }
 
     public void ApplySave(ComponentDatabaseArray save) {
         this.startTime = save.startTime;
-        this.totalTime = save.totalTime;
         this.deltaTime = save.deltaTime;
         this.frameCounter = save.frameCounter;
         this.entitiesCounter = save.entitiesCounter;
@@ -136,7 +136,6 @@ public class ComponentDatabaseArray : System.ICloneable
     {
         ComponentDatabaseArray clonedInstance = new();
         clonedInstance.startTime = this.startTime;
-        clonedInstance.totalTime = this.totalTime;
         clonedInstance.deltaTime = this.deltaTime;
         clonedInstance.frameCounter = this.frameCounter;
         clonedInstance.entitiesCounter = this.entitiesCounter;

@@ -27,7 +27,6 @@ public class HandleSave : ISystem {
         }
 
         if (saveRequested) {
-
             var ecsController = ECSController.Instance;
 
             for (uint i = 0; i < _componentDatabase.entitiesCounter; i++) {

@@ -83,7 +83,6 @@ public class IsColliding : IComponent, System.ICloneable
 }
 
 public class IsExploded : IComponent, System.ICloneable {
-
     public object Clone()
     {
         return new IsExploded();
