@@ -135,7 +135,7 @@ public class HandleCollisionArray : ISystem
                 }
 
                 if (_componentDatabase.isProtecteds[id1] != null && _componentDatabase.isProtecteds[id2] != null) {
-                    continue;
+                    // do nothing
                 } else if (_componentDatabase.isProtecteds[id1] != null) {
                     if (size2 > size1) {
                         deltaSizes[id2]--;
