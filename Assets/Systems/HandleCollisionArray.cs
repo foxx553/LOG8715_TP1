@@ -135,7 +135,7 @@ public class HandleCollisionArray : ISystem
                 }
 
                 if (_componentDatabase.isProtecteds[id1] != null && _componentDatabase.isProtecteds[id2] != null) {
-                    // do nothing
+                    continue;
                 } else if (_componentDatabase.isProtecteds[id1] != null) {
                     if (size2 > size1) {
                         deltaSizes[id2]--;
@@ -180,10 +180,6 @@ public class HandleCollisionArray : ISystem
             if (deltaSizes.ContainsKey(id))
             {
                 _componentDatabase.sizeComponents[id].Size += deltaSizes[id];
-                if (_componentDatabase.sizeComponents[id].Size <= ecsController.Config.protectionSize)
-                {
-                    _componentDatabase.UpdateIsProtectable(id, 0);
-                }
             }
             _componentDatabase.UpdateIsColliding(id, true);
         }

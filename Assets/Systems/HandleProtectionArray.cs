@@ -17,13 +17,14 @@ public class HandleProtectionArray : ISystem
 
             if (_componentDatabase.positionComponents[id].Position.x > 0f ////
             && ((_componentDatabase.frameCounter % 4) != 0)) continue;
-
+            
             if (_componentDatabase.cooldownComponents[id] != null
-                || _componentDatabase.sizeComponents[id].Size > ecsController.Config.protectionSize) {
+                || (_componentDatabase.sizeComponents[id].Size > ecsController.Config.protectionSize)) {
                 _componentDatabase.isProtectables[id] = null;
             } 
-            else if (_componentDatabase.isProtectables[id] == null) {
-                _componentDatabase.UpdateIsProtectable(id, 0);
+            else if (_componentDatabase.isProtectables[id] == null 
+                    && _componentDatabase.sizeComponents[id].Size <= ecsController.Config.protectionSize) {
+                _componentDatabase.UpdateIsProtectable(id,0);
             }
             else if (_componentDatabase.isProtectables[id].ProtectionCount >= ecsController.Config.protectionCollisionCount) {
                 _componentDatabase.isProtectables[id] = null;

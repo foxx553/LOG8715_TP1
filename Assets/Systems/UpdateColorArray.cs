@@ -18,40 +18,39 @@ public class UpdateColorArray : ISystem
             if (_componentDatabase.positionComponents[id].Position.x > 0f //////
                 && ((_componentDatabase.frameCounter % 4) != 0)) continue;
 
-            if (_componentDatabase.isStatics[id] != null){
-                ecsController.UpdateShapeColor(id, Color.red);
+            Color color = Color.blue;
+
+            if (_componentDatabase.sizeComponents[id].Size >= ecsController.Config.explosionSize - 1){
+                color = new Color(1.0f, 0.64f, 0.0f);
             }
-            else if (_componentDatabase.isCollidings[id] != null)
+            if (_componentDatabase.cooldownComponents[id] != null)
             {
-                ecsController.UpdateShapeColor(id, Color.green);
-                _componentDatabase.isCollidings[id] = null;
+                color = Color.yellow;
             }
-            else if (_componentDatabase.isExplodeds[id] != null)
+            if (_componentDatabase.isProtectables[id] != null){
+                if (_componentDatabase.isProtectables[id].ProtectionCount
+                    == (ecsController.Config.protectionCollisionCount - 1)){
+                        color = Color.cyan;
+                    }
+            }
+            if (_componentDatabase.isProtecteds[id] != null)
             {
-                ecsController.UpdateShapeColor(id, Color.magenta);
+                color = Color.white;
+            }
+            if (_componentDatabase.isExplodeds[id] != null)
+            {
+                color = Color.magenta;
                 _componentDatabase.isExplodeds[id] = null;
             }
-            else if (_componentDatabase.isProtecteds[id] != null)
+            if (_componentDatabase.isCollidings[id] != null)
             {
-                ecsController.UpdateShapeColor(id, Color.white);
+                color = Color.green;
+                _componentDatabase.isCollidings[id] = null;
             }
-            else if ((_componentDatabase.isProtectables[id] != null)
-                    && (_componentDatabase.isProtectables[id].ProtectionCount
-                    == (ecsController.Config.protectionCollisionCount - 1))){
-                ecsController.UpdateShapeColor(id, Color.cyan);
+            if (_componentDatabase.isStatics[id] != null){
+                color = Color.red;
             }
-            else if (_componentDatabase.cooldownComponents[id] != null)
-            {
-                ecsController.UpdateShapeColor(id, Color.yellow);
-            }
-            else if (_componentDatabase.sizeComponents[id].Size >= ecsController.Config.explosionSize - 1){
-                ecsController.UpdateShapeColor(id, new Color(1.0f, 0.64f, 0.0f));
-            }
-            else
-            {
-                ecsController.UpdateShapeColor(id, Color.blue);
-            }
-
+            ecsController.UpdateShapeColor(id, color);
         }
     }
 }

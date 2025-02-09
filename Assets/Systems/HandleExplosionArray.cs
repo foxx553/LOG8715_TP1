@@ -70,10 +70,7 @@ public class HandleExplosionArray : ISystem{
                 _componentDatabase.UpdateIsExploded(newId, true);
                 ecsController.CreateShape(newId, newSize);
                 ecsController.UpdateShapePosition(newId, newPositions[i]);
-
-                if (newSize <= ecsController.Config.protectionSize)
-                    _componentDatabase.UpdateIsProtectable(newId, 0);
-            }
+        }
         }
     }
 }
