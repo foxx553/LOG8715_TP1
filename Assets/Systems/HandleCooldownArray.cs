@@ -24,9 +24,7 @@ public class HandleCooldownArray : ISystem
                     _componentDatabase.isProtecteds[id] = null;
                     _componentDatabase.UpdateCooldown(id, ecsController.Config.protectionCooldown);
                 }
-            }
-
-            if (_componentDatabase.cooldownComponents[id] != null){
+            } else if (_componentDatabase.cooldownComponents[id] != null){
                 _componentDatabase.cooldownComponents[id].DeltaTime -= _componentDatabase.deltaTime;
                 if (_componentDatabase.cooldownComponents[id].DeltaTime <= 0){
                     _componentDatabase.cooldownComponents[id] = null;

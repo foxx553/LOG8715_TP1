@@ -30,10 +30,6 @@ public class InitializationArray : ISystem{
                 _componentDatabase.UpdateIsStatic(id);
                 _componentDatabase.UpdateIsImmortal(id, true);
             }
-            if (_componentDatabase.sizeComponents[id].Size <= ecsController.Config.protectionSize)
-            {
-                _componentDatabase.UpdateIsProtectable(id, 0);
-            }
             ecsController.CreateShape(id, _componentDatabase.sizeComponents[id].Size);
             ecsController.UpdateShapePosition(id, shapeConfig.initialPosition);
             _componentDatabase.entitiesCounter++;

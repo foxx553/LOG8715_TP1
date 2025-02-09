@@ -180,10 +180,6 @@ public class HandleCollisionArray : ISystem
             if (deltaSizes.ContainsKey(id))
             {
                 _componentDatabase.sizeComponents[id].Size += deltaSizes[id];
-                if (_componentDatabase.sizeComponents[id].Size <= ecsController.Config.protectionSize)
-                {
-                    _componentDatabase.UpdateIsProtectable(id, 0);
-                }
             }
             _componentDatabase.UpdateIsColliding(id, true);
         }
