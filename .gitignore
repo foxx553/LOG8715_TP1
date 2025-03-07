@@ -77,6 +77,8 @@ TP2/.consulo/
 # Unity3D generated file on crash reports
 sysinfo.txt
 
+TP2/sysinfo.txt
+
 # Builds
 *.apk
 *.aab
@@ -85,6 +87,8 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
+
+TP2/crashlytics-build.properties
 
 # Packed Addressables
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
