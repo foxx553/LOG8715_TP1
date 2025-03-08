@@ -14,6 +14,12 @@ public class Character : MonoBehaviour
 
     private const float DamageRange = 10;
 
+    private Collider2D[] accelerationCollidersCache; // Pre-allocate array
+
+    private void Start() {
+        accelerationCollidersCache = new Collider2D[20];
+    }
+
     private void Update()
     {
         Move();
@@ -34,10 +40,11 @@ public class Character : MonoBehaviour
     private void UpdateAcceleration()
     {
         var direction = Vector3.zero;
-        var nearbyColliders = Physics2D.OverlapCircleAll(transform.position, DamageRange);
-        foreach (var nearbyCollider in nearbyColliders)
+        int count = Physics2D.OverlapCircleNonAlloc(transform.position, DamageRange, accelerationCollidersCache);
+        
+        for (int i = 0; i < count; i++)
         {
-            if (nearbyCollider.TryGetComponent<Circle>(out var circle))
+            if (accelerationCollidersCache[i].TryGetComponent<Circle>(out var circle))
             {
                 direction += (circle.transform.position - transform.position) * circle.Health;
             }
