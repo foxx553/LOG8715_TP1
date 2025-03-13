@@ -17,7 +17,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Ex3/Scenes/Ex3.unity
     guid: 35b944bc9a4f5bf418f27a93179512ad
-  - enabled: 1
+  - enabled: 0
     path: Assets/Ex3/Scenes/Ex3.unity
     guid: 35b944bc9a4f5bf418f27a93179512ad
   m_configObjects: {}
