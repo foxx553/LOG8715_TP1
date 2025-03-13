@@ -1,5 +1,6 @@
 using Unity.Entities;
 using UnityEngine;
+using static ECSComponents;
 
 public class PlantBaker : Baker<PlantAuthoring>
 {

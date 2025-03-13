@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using static ECSComponents;
 
 [BurstCompile]
 public partial struct PlantScalingSystem : ISystem

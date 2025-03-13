@@ -1,15 +1,22 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using Unity.Rendering;
 using UnityEngine;
+using static ECSComponents;
 
 public partial class SpawnerSystem : SystemBase
 {
+
+    protected override void OnCreate()
+    {
+        // Require SpawnerConfig to exist before running the system
+        RequireForUpdate<SpawnerConfig>();
+    }
+
     protected override void OnUpdate()
     {
         // Get the SpawnerConfig component
-        var config = GetSingleton<SpawnerConfig>();
+        var config = SystemAPI.GetSingleton<SpawnerConfig>();
 
         // Spawn plants, prey, and predators
         SpawnEntities(config.plantCount, config.plantPrefab);
@@ -27,8 +34,8 @@ public partial class SpawnerSystem : SystemBase
         for (int i = 0; i < count; i++)
         {
             var instance = entityManager.Instantiate(prefab);
-            var position = new float3(Random.Range(-10, 10), Random.Range(-10, 10), 0); // Random position
-            entityManager.SetComponentData(instance, new Translation { Value = position });
+            var position = new float3(UnityEngine.Random.Range(-10, 10), UnityEngine.Random.Range(-10, 10), 0); // Random position
+            entityManager.SetComponentData(instance, new LocalTransform { Position = position });
         }
     }
 }

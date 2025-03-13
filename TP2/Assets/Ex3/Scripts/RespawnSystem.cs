@@ -3,6 +3,7 @@ using Unity.Burst;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Random = Unity.Mathematics.Random;
+using static ECSComponents;
 
 [BurstCompile]
 public partial struct RespawnSystem : ISystem
@@ -14,10 +15,10 @@ public partial struct RespawnSystem : ISystem
         float deltaTime = SystemAPI.Time.DeltaTime;
 
         // Process entities with RespawnTag
-        foreach (var (transform, entity) in SystemAPI.Query<RefRW<Translation>>().WithAll<RespawnTag>().WithEntityAccess())
+        foreach (var (transform, entity) in SystemAPI.Query<RefRW<LocalTransform>>().WithAll<RespawnTag>().WithEntityAccess())
         {
             // Respawn at a random position
-            transform.ValueRW.Value = new float3(
+            transform.ValueRW.Position = new float3(
                 random.NextFloat(-10, 10),
                 random.NextFloat(-10, 10),
                 0

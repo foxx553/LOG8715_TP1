@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using static ECSComponents;
 
 [BurstCompile]
 public partial struct ApplyVelocitySystem : ISystem
@@ -11,10 +12,10 @@ public partial struct ApplyVelocitySystem : ISystem
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
 
-        // Process all entities with Velocity and Translation
-        foreach (var (velocity, position) in SystemAPI.Query<RefRO<Velocity>, RefRW<Translation>>())
+        // Process all entities with Velocity and LocalTransform
+        foreach (var (velocity, position) in SystemAPI.Query<RefRO<Velocity>, RefRW<LocalTransform>>())
         {
-            position.ValueRW.Value += velocity.ValueRO.Value * deltaTime;
+            position.ValueRW.Position += velocity.ValueRO.Value * deltaTime;
         }
     }
 }

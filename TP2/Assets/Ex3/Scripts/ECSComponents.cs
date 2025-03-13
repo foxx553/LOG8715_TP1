@@ -23,7 +23,7 @@ public static class ECSComponents
         public float3 Value; // Represents movement direction and speed
     }
 
-    // Position component (optional, since Unity.Transforms.Translation already exists)
+    // Position component (optional, since Unity.Transforms.LocalTransform already exists)
     public struct Position : IComponentData
     {
         public float3 Value; // Represents the entity's position
