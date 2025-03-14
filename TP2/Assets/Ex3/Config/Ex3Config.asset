@@ -9,10 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c49abc3c82d6e344dbabb88e625e0841, type: 3}
+  m_Script: {fileID: 11500000, guid: 860d2795851a7f94c8764a01a4c847eb, type: 3}
   m_Name: Ex3Config
   m_EditorClassIdentifier: 
   plantCount: 100
   preyCount: 100
   predatorCount: 100
   gridSize: 400
+  preySpeed: 1
+  predatorSpeed: 0.5
+  touchingDistance: 0.5
