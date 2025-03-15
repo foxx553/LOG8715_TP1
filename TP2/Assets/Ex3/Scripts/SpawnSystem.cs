@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
 [BurstCompile]
@@ -11,52 +12,116 @@ public partial struct SpawnSystem : ISystem
     private Random _random;
     private int _width;
     private int _height;
-    
+    private bool _hasInitialized;
+
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        Debug.Log("SpawnSystem: OnCreate called");
         state.RequireForUpdate<Spawner>();
         state.RequireForUpdate<ConfigComponent>();
         _random = Random.CreateFromIndex(1234); // Seed for reproducibility
+        _hasInitialized = false;
     }
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        // Calculate grid dimensions once per frame
+        Debug.Log("SpawnSystem: OnUpdate running");
+
+        var spawner = SystemAPI.GetSingleton<Spawner>();
         var config = SystemAPI.GetSingleton<ConfigComponent>();
+        var ecb = new EntityCommandBuffer(Allocator.Temp);
+
+        float ratio = 16f / 9f; // Cant use camera in Burst Compile
+
+        // Calculate grid dimensions once per frame
         var size = (float)config.gridSize;
-        var ratio = 16f/9f; // We can't use Camera.main in a job, so use a fixed ratio or provide from config
-        
         _height = (int)math.round(math.sqrt(size / ratio));
         _width = (int)math.round(size / _height);
-        
-        // Get ECB and create a parallel writer
-        var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-        var ecbParallel = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
-        
-        // Create a NativeArray to store random positions - one per potential entity
+
+        // Handle initial spawning of entities if not yet done
+        if (!_hasInitialized)
+        {
+            Debug.Log("SpawnSystem: Starting initial spawning");
+            InitialSpawn(ref state, ecb, spawner, config);
+            _hasInitialized = true;
+            Debug.Log("SpawnSystem: Initial spawning completed");
+        }
+
+        // Handle respawning of entities marked with RespawnTag
+        HandleRespawning(ref state);
+
+        // Play back the command buffer and dispose it
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
+    }
+
+    private void InitialSpawn(ref SystemState state, EntityCommandBuffer ecb, Spawner spawner, ConfigComponent config)
+    {
+        Debug.Log($"Initializing simulation with: Plants={config.plantCount}, Prey={config.preyCount}, Predators={config.predatorCount}");
+
+        // Spawn plants
+        for (int i = 0; i < config.plantCount; i++)
+        {
+            Entity plantEntity = ecb.Instantiate(spawner.plantPrefab);
+            PlaceRandomly(ecb, plantEntity);
+        }
+
+        // Spawn prey
+        for (int i = 0; i < config.preyCount; i++)
+        {
+            Entity preyEntity = ecb.Instantiate(spawner.preyPrefab);
+            PlaceRandomly(ecb, preyEntity);
+        }
+
+        // Spawn predators
+        for (int i = 0; i < config.predatorCount; i++)
+        {
+            Entity predatorEntity = ecb.Instantiate(spawner.predatorPrefab);
+            PlaceRandomly(ecb, predatorEntity);
+        }
+    }
+
+    private void HandleRespawning(ref SystemState state)
+    {
         var spawnPositions = new NativeArray<float3>(1000, Allocator.TempJob);
-        
-        // Pre-calculate some random positions to use
+
         for (int i = 0; i < spawnPositions.Length; i++)
         {
             spawnPositions[i] = GetRandomPosition();
         }
-        
-        // Schedule the respawn job and update dependency chain
-        // (removed .Complete() to allow async execution)
+
+        var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+        var ecbParallel = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
+
+        // Schedule the respawn job
         state.Dependency = new RespawnJob
         {
             ecb = ecbParallel,
             randomPositions = spawnPositions
         }.ScheduleParallel(state.Dependency);
-        
-        // Register cleanup of native arrays in the dependency chain
+
+        // Register cleanup of native arrays
         state.Dependency = spawnPositions.Dispose(state.Dependency);
     }
-    
+
+    private void PlaceRandomly(EntityCommandBuffer ecb, Entity entity)
+    {
+        int halfWidth = _width / 2;
+        int halfHeight = _height / 2;
+
+        float3 position = new float3(
+            _random.NextInt(-halfWidth, halfWidth),
+            _random.NextInt(-halfHeight, halfHeight),
+            0
+        );
+
+        ecb.SetComponent(entity, LocalTransform.FromPosition(position));
+    }
+
     [BurstCompile]
+    [WithAll(typeof(RespawnTag))]
     partial struct RespawnJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter ecb;
@@ -64,10 +129,7 @@ public partial struct SpawnSystem : ISystem
         
         void Execute(RefRW<LocalTransform> transform, Entity entity, [EntityIndexInQuery] int sortKey)
         {
-            // Get a position using the sortKey as an index (with wrapping)
             transform.ValueRW.Position = randomPositions[sortKey % randomPositions.Length];
-            
-            // Remove the respawn tag
             ecb.RemoveComponent<RespawnTag>(sortKey, entity);
         }
     }
@@ -76,8 +138,7 @@ public partial struct SpawnSystem : ISystem
     {
         int halfWidth = _width / 2;
         int halfHeight = _height / 2;
-        
-        // Generate random position within grid bounds
+
         return new float3(
             _random.NextInt(-halfWidth, halfWidth),
             _random.NextInt(-halfHeight, halfHeight),

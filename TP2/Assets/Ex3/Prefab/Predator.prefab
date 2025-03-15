@@ -115,6 +115,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   alwaysReproduce: 0
+  decreasingFactor: 1
 --- !u!114 &57677699752138845
 MonoBehaviour:
   m_ObjectHideFlags: 0

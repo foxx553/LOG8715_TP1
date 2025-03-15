@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class ConfigAuthoring : MonoBehaviour
 {
-    // Add serialized fields for configuration values in Inspector
     [Header("Entity Counts")]
     [SerializeField] public int plantCount = 100;
     [SerializeField] public int preyCount = 100;
