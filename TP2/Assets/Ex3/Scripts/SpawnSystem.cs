@@ -17,7 +17,6 @@ public partial struct SpawnSystem : ISystem
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        Debug.Log("SpawnSystem: OnCreate called");
         state.RequireForUpdate<Spawner>();
         state.RequireForUpdate<ConfigComponent>();
         _random = Random.CreateFromIndex(1234); // Seed for reproducibility
@@ -27,8 +26,6 @@ public partial struct SpawnSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        Debug.Log("SpawnSystem: OnUpdate running");
-
         var spawner = SystemAPI.GetSingleton<Spawner>();
         var config = SystemAPI.GetSingleton<ConfigComponent>();
         var ecb = new EntityCommandBuffer(Allocator.Temp);
