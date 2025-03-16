@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Character : MonoBehaviour
@@ -18,9 +17,8 @@ public class Character : MonoBehaviour
     private void Update()
     {
         Move();
-        var nearbyCircles = GetCurrentNearbyCircles();
-        DamageNearbyShapes(nearbyCircles);
-        UpdateAcceleration(nearbyCircles);
+        DamageNearbyShapes();
+        UpdateAcceleration();
     }
 
     private void Move()
@@ -33,40 +31,36 @@ public class Character : MonoBehaviour
         transform.position += _velocity * Time.deltaTime;
     }
 
-    private List<Circle> GetCurrentNearbyCircles() {
-        List<Circle> nearbyCircles = new List<Circle>();
+    private void UpdateAcceleration()
+    {
+        var direction = Vector3.zero;
         var nearbyColliders = Physics2D.OverlapCircleAll(transform.position, DamageRange);
         foreach (var nearbyCollider in nearbyColliders)
         {
             if (nearbyCollider.TryGetComponent<Circle>(out var circle))
             {
-                nearbyCircles.Add(circle);
+                direction += (circle.transform.position - transform.position) * circle.Health;
             }
-        }
-        return nearbyCircles;
-    }
-
-    private void UpdateAcceleration(List<Circle> nearbyCircles)
-    {
-        var direction = Vector3.zero;
-        foreach (var circle in nearbyCircles)
-        {    
-            direction += (circle.transform.position - transform.position) * circle.Health;
         }
         _acceleration = direction.normalized * AccelerationMagnitude;
     }
 
-    private void DamageNearbyShapes(List<Circle> nearbyCircles)
+    private void DamageNearbyShapes()
     {
+        var nearbyColliders = Physics2D.OverlapCircleAll(transform.position, DamageRange);
+
         // Si aucun cercle proche, on retourne a (0,0,0)
-        if (nearbyCircles.Count == 0)
+        if (nearbyColliders.Length == 0)
         {
             transform.position = Vector3.zero;
         }
 
-        foreach(var circle in nearbyCircles)
+        foreach(var nearbyCollider in nearbyColliders)
         {
-            circle.ReceiveHp(-DamagePerSecond * Time.deltaTime);
+            if (nearbyCollider.TryGetComponent<Circle>(out var circle))
+            {
+                circle.ReceiveHp(-DamagePerSecond * Time.deltaTime);
+            }
         }
     }
 }
