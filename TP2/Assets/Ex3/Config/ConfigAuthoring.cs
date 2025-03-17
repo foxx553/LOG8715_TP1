@@ -4,12 +4,12 @@ using UnityEngine;
 public class ConfigAuthoring : MonoBehaviour
 {
     [Header("Entity Counts")]
-    [SerializeField] public int plantCount = 100;
-    [SerializeField] public int preyCount = 100;
-    [SerializeField] public int predatorCount = 100;
+    [SerializeField] public int plantCount = 3000;
+    [SerializeField] public int preyCount = 3000;
+    [SerializeField] public int predatorCount = 2500;
 
     [Header("World Settings")]
-    [SerializeField] public int gridSize = 400;
+    [SerializeField] public int gridSize = 12000;
 
     [Header("Movement Settings")]
     [SerializeField] public float preySpeed = 1.0f;
