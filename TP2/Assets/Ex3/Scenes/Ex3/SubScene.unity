@@ -194,10 +194,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 860d2795851a7f94c8764a01a4c847eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  plantCount: 3000
-  preyCount: 3000
-  predatorCount: 2500
-  gridSize: 12000
+  plantCount: 200
+  preyCount: 200
+  predatorCount: 200
+  gridSize: 600
   preySpeed: 1
   predatorSpeed: 0.5
   touchingDistance: 0.5
