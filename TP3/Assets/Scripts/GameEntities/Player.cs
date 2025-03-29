@@ -7,9 +7,26 @@ public class Player : NetworkBehaviour
 {
     [SerializeField]
     private float m_Velocity;
+    // Added for PlayerGhost access
+    public float Velocity => m_Velocity;
 
     [SerializeField]
     private float m_Size = 1;
+
+    private NetworkVariable<Vector2> m_Position = new NetworkVariable<Vector2>();
+    public Vector2 Position => m_Position.Value;
+
+    private Queue<Vector2> m_InputQueue = new Queue<Vector2>();
+    // For client prediction
+    private List<Vector2> m_InputHistory = new List<Vector2>();
+
+    // Reference to PlayerGhost (set in inspector or find automatically)
+    private PlayerGhost m_PlayerGhost;
+
+    public void RegisterPlayerGhost(PlayerGhost playerGhost)
+    {
+        m_PlayerGhost = playerGhost;
+    }
 
     private GameState m_GameState;
 
@@ -25,12 +42,6 @@ public class Player : NetworkBehaviour
             return m_GameState;
         }
     }
-
-    private NetworkVariable<Vector2> m_Position = new NetworkVariable<Vector2>();
-
-    public Vector2 Position => m_Position.Value;
-
-    private Queue<Vector2> m_InputQueue = new Queue<Vector2>();
 
     private void Awake()
     {
@@ -107,7 +118,18 @@ public class Player : NetworkBehaviour
         {
             inputDirection += Vector2.right;
         }
-        SendInputServerRpc(inputDirection.normalized);
+        
+        if (inputDirection != Vector2.zero)
+        {
+            // Store input for potential reconciliation
+            m_InputHistory.Add(inputDirection);
+
+            // Predict locally
+            m_PlayerGhost.PredictMovement(inputDirection, Time.fixedDeltaTime);
+
+            // Send to server
+            SendInputServerRpc(inputDirection.normalized);
+        }
     }
 
 
