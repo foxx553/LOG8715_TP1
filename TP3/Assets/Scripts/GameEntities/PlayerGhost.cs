@@ -13,6 +13,22 @@ public class PlayerGhost : NetworkBehaviour
     // For client prediction
     private Vector2 m_PredictedPosition;
     private bool m_IsPredicting = false;
+    private float m_Size = 1;
+
+    private GameState m_GameState;
+
+    // GameState peut etre nul si l'entite joueur est instanciee avant de charger MainScene
+    private GameState GameState
+    {
+        get
+        {
+            if (m_GameState == null)
+            {
+                m_GameState = FindObjectOfType<GameState>();
+            }
+            return m_GameState;
+        }
+    }
 
     public override void OnNetworkSpawn()
     {
@@ -51,6 +67,26 @@ public class PlayerGhost : NetworkBehaviour
 
         m_IsPredicting = true;
         m_PredictedPosition += direction * m_Player.Velocity * deltaTime;
+        // Gestion des collisions avec l'exterieur de la zone de simulation
+        var size = GameState.GameSize;
+        if (m_PredictedPosition.x - m_Size < -size.x)
+        {
+            m_PredictedPosition = new Vector2(-size.x + m_Size, m_PredictedPosition.y);
+        }
+        else if (m_PredictedPosition.x + m_Size > size.x)
+        {
+            m_PredictedPosition = new Vector2(size.x - m_Size, m_PredictedPosition.y);
+        }
+
+        if (m_PredictedPosition.y + m_Size > size.y)
+        {
+            m_PredictedPosition = new Vector2(m_PredictedPosition.x, size.y - m_Size);
+        }
+        else if (m_PredictedPosition.y - m_Size < -size.y)
+        {
+            m_PredictedPosition = new Vector2(m_PredictedPosition.x, -size.y + m_Size);
+        }
+        
     }
 
     // Called when server updates arrive
