@@ -1,23 +1,18 @@
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
 public class PlayerGhost : NetworkBehaviour
 {
+    // Player's data
     [SerializeField] 
     private Player m_Player;
-    [SerializeField] 
-    private SpriteRenderer m_SpriteRenderer;
-
-    // For client prediction
-    private Vector2 m_PredictedPosition;
-    private bool m_IsPredicting = false;
     private float m_Size = 1;
+    [SerializeField] 
+    private SpriteRenderer m_SpriteRenderer;    
 
+    // Game data
     private GameState m_GameState;
-
-    // GameState peut etre nul si l'entite joueur est instanciee avant de charger MainScene
     private GameState GameState
     {
         get
@@ -30,44 +25,42 @@ public class PlayerGhost : NetworkBehaviour
         }
     }
 
+    // Local ghost predictions
+    private Vector2 m_PredictedPosition;
+    private Dictionary<int, Vector2> m_PredictionHistory = new Dictionary<int, Vector2>();
+
     public override void OnNetworkSpawn()
     {
-        // L'entite qui appartient au client est recoloriee en rouge
         if (IsOwner)
         {
             m_SpriteRenderer.color = Color.red;
-            
-            // Initialize predicted position to current position
             m_PredictedPosition = m_Player.Position;
-
-            // Register the ghost with the Player component
             m_Player.RegisterPlayerGhost(this);
         }
     }
 
     private void Update()
     {
+        // Owned ghost follows predictions
         if (IsOwner)
         {
-            // Use predicted position if we're predicting
-            transform.position = m_IsPredicting ? m_PredictedPosition : m_Player.Position;
+            transform.position = m_PredictedPosition;
         }
+        // Non-owned ghosts follow server positions
         else
         {
-            // Non-owned clients just follow server position
             transform.position = m_Player.Position;
         }
     }
 
-
-    // Called by Player when input is detected
+    // Local prediction for the owned ghost
     public void PredictMovement(Vector2 direction, float deltaTime)
     {
-        if (!IsOwner) return;
+        if (!IsOwner || NetworkManager.Singleton == null) return;
 
-        m_IsPredicting = true;
+        // Updating predicted position
+        int currentTick = NetworkUtility.GetLocalTick();
         m_PredictedPosition += direction * m_Player.Velocity * deltaTime;
-        // Gestion des collisions avec l'exterieur de la zone de simulation
         var size = GameState.GameSize;
         if (m_PredictedPosition.x - m_Size < -size.x)
         {
@@ -77,7 +70,6 @@ public class PlayerGhost : NetworkBehaviour
         {
             m_PredictedPosition = new Vector2(size.x - m_Size, m_PredictedPosition.y);
         }
-
         if (m_PredictedPosition.y + m_Size > size.y)
         {
             m_PredictedPosition = new Vector2(m_PredictedPosition.x, size.y - m_Size);
@@ -86,15 +78,20 @@ public class PlayerGhost : NetworkBehaviour
         {
             m_PredictedPosition = new Vector2(m_PredictedPosition.x, -size.y + m_Size);
         }
+        m_PredictionHistory[currentTick] = m_PredictedPosition;
         
     }
 
-    // Called when server updates arrive
-    public void Reconcile(Vector2 serverPosition)
+    // Local reconciliation for the owned ghost
+    public void Reconcile(Vector2 serverPosition, int serverTick)
     {
         if (!IsOwner) return;
 
-        m_IsPredicting = false;
-        m_PredictedPosition = serverPosition;
+        if (m_PredictionHistory.TryGetValue(serverTick, out var predictedPos))
+        {
+            Vector2 error = serverPosition - predictedPos;
+            m_PredictedPosition += error;
+            m_PredictionHistory.Clear();
+        }
     }
 }

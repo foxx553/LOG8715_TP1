@@ -1,36 +1,30 @@
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
 public class Player : NetworkBehaviour
 {
+    // Size, velocity, position
     [SerializeField]
     private float m_Velocity;
-    // Added for PlayerGhost access
     public float Velocity => m_Velocity;
-
     [SerializeField]
     private float m_Size = 1;
-
     private NetworkVariable<Vector2> m_Position = new NetworkVariable<Vector2>();
     public Vector2 Position => m_Position.Value;
 
-    private Queue<Vector2> m_InputQueue = new Queue<Vector2>();
-    // For client prediction
-    private List<Vector2> m_InputHistory = new List<Vector2>();
-
-    // Reference to PlayerGhost (set in inspector or find automatically)
+    // Local player
     private PlayerGhost m_PlayerGhost;
-
     public void RegisterPlayerGhost(PlayerGhost playerGhost)
     {
         m_PlayerGhost = playerGhost;
     }
 
-    private GameState m_GameState;
+    // Managing several inputs pressed together (example: up AND down) 
+    private Queue<Vector2> m_InputQueue = new Queue<Vector2>();
 
-    // GameState peut etre nul si l'entite joueur est instanciee avant de charger MainScene
+    // Game data
+    private GameState m_GameState;
     private GameState GameState
     {
         get
@@ -43,26 +37,28 @@ public class Player : NetworkBehaviour
         }
     }
 
-    private void Awake()
-    {
-        m_GameState = FindObjectOfType<GameState>();
-    }
-
     private void FixedUpdate()
     {
-        // Si le stun est active, rien n'est mis a jour.
+        
+        // No updates if no game data or during a stun
         if (GameState == null || GameState.IsStunned)
         {
             return;
         }
 
-        // Seul le serveur met à jour la position de l'entite.
+        // Server updating player's position and broadcasting it
         if (IsServer)
         {
             UpdatePositionServer();
+
+            int currentTick = NetworkUtility.GetLocalTick();
+            if (currentTick % 10 == 0)
+            {
+                BroadcastPositionClientRpc(m_Position.Value, currentTick);
+            }
         }
 
-        // Seul le client qui possede cette entite peut envoyer ses inputs. 
+        // Client sending its own inputs
         if (IsClient && IsOwner)
         {
             UpdateInputClient();
@@ -71,13 +67,11 @@ public class Player : NetworkBehaviour
 
     private void UpdatePositionServer()
     {
-        // Mise a jour de la position selon dernier input reçu, puis consommation de l'input
+        // Consuming all inputs and updating server's position
         if (m_InputQueue.Count > 0)
         {
             var input = m_InputQueue.Dequeue();
             m_Position.Value += input * m_Velocity * Time.deltaTime;
-
-            // Gestion des collisions avec l'exterieur de la zone de simulation
             var size = GameState.GameSize;
             if (m_Position.Value.x - m_Size < -size.x)
             {
@@ -101,6 +95,7 @@ public class Player : NetworkBehaviour
 
     private void UpdateInputClient()
     {
+        // Getting the resulting direction
         Vector2 inputDirection = new Vector2(0, 0);
         if (Input.GetKey(KeyCode.W))
         {
@@ -121,13 +116,10 @@ public class Player : NetworkBehaviour
         
         if (inputDirection != Vector2.zero)
         {
-            // Store input for potential reconciliation
-            m_InputHistory.Add(inputDirection);
-
-            // Predict locally
+            // Prediction for the local ghost
             m_PlayerGhost.PredictMovement(inputDirection, Time.fixedDeltaTime);
 
-            // Send to server
+            // Sending the inputs to the server
             SendInputServerRpc(inputDirection.normalized);
         }
     }
@@ -136,10 +128,17 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     private void SendInputServerRpc(Vector2 input)
     {
-        // On utilise une file pour les inputs pour les cas ou on en recoit plusieurs en meme temps.
         m_InputQueue.Enqueue(input);
     }
 
-
+    [ClientRpc]
+    private void BroadcastPositionClientRpc(Vector2 position, int serverTick)
+    {
+        if (m_PlayerGhost != null)
+        {
+            // Reconciliation for the local ghost
+            m_PlayerGhost.Reconcile(position, serverTick);
+        }
+    }
 
 }
