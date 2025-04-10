@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Player : NetworkBehaviour
 {
+    #region Attributes
     // Size, velocity, position
     [SerializeField]
     private float m_Velocity;
@@ -13,15 +14,12 @@ public class Player : NetworkBehaviour
     private NetworkVariable<Vector2> m_Position = new NetworkVariable<Vector2>();
     public Vector2 Position => m_Position.Value;
 
-    // Local player
-    private PlayerGhost m_PlayerGhost;
-    public void RegisterPlayerGhost(PlayerGhost playerGhost)
-    {
-        m_PlayerGhost = playerGhost;
-    }
+    // Local ghost predictions
+    public Vector2 m_PredictedPosition;
+    private Dictionary<int, Vector2> m_PredictionHistory = new Dictionary<int, Vector2>();
 
     // Managing several inputs pressed together (example: up AND down) 
-    private Queue<Vector2> m_InputQueue = new Queue<Vector2>();
+    private Queue<KeyValuePair<int, Vector2>> m_InputQueue = new Queue<KeyValuePair<int, Vector2>>();
 
     // Game data
     private GameState m_GameState;
@@ -37,6 +35,10 @@ public class Player : NetworkBehaviour
         }
     }
 
+    // History counter
+    private int m_TickCounter = 0;
+    #endregion
+
     private void FixedUpdate()
     {
         
@@ -49,28 +51,32 @@ public class Player : NetworkBehaviour
         // Server updating player's position and broadcasting it
         if (IsServer)
         {
-            UpdatePositionServer();
+            UpdatePositionServer(out int tickCounter);
 
-            int currentTick = NetworkUtility.GetLocalTick();
-            if (currentTick % 10 == 0)
+            if (tickCounter != -1)
             {
-                BroadcastPositionClientRpc(m_Position.Value, currentTick);
+                BroadcastPositionClientRpc(m_Position.Value, tickCounter);
             }
         }
 
         // Client sending its own inputs
         if (IsClient && IsOwner)
         {
+            m_TickCounter++;
             UpdateInputClient();
         }
     }
 
-    private void UpdatePositionServer()
+    #region Server/Client updates
+    private void UpdatePositionServer(out int tickCounter)
     {
+        tickCounter = -1;
         // Consuming all inputs and updating server's position
         if (m_InputQueue.Count > 0)
         {
-            var input = m_InputQueue.Dequeue();
+            var inputPair = m_InputQueue.Dequeue();
+            var input = inputPair.Value;
+            tickCounter = inputPair.Key;
             m_Position.Value += input * m_Velocity * Time.deltaTime;
             var size = GameState.GameSize;
             if (m_Position.Value.x - m_Size < -size.x)
@@ -117,28 +123,70 @@ public class Player : NetworkBehaviour
         if (inputDirection != Vector2.zero)
         {
             // Prediction for the local ghost
-            m_PlayerGhost.PredictMovement(inputDirection, Time.fixedDeltaTime);
+            PredictMovement(inputDirection, Time.fixedDeltaTime);
 
             // Sending the inputs to the server
-            SendInputServerRpc(inputDirection.normalized);
+            SendInputServerRpc(inputDirection.normalized, m_TickCounter);
         }
     }
+    #endregion
 
-
+    #region Rpc
     [ServerRpc]
-    private void SendInputServerRpc(Vector2 input)
+    private void SendInputServerRpc(Vector2 input, int tickCounter)
     {
-        m_InputQueue.Enqueue(input);
+        m_InputQueue.Enqueue(new KeyValuePair<int, Vector2>(tickCounter, input));
     }
 
     [ClientRpc]
     private void BroadcastPositionClientRpc(Vector2 position, int serverTick)
     {
-        if (m_PlayerGhost != null)
+        
+        Reconcile(position, serverTick);
+    }
+    #endregion
+
+    #region Prediction/Reconciliation
+    // Local prediction for the owned ghost
+    public void PredictMovement(Vector2 direction, float deltaTime)
+    {
+        if (!IsOwner || NetworkManager.Singleton == null) return;
+
+        // Updating predicted position
+        m_PredictedPosition += direction * Velocity * deltaTime;
+        var size = GameState.GameSize;
+        if (m_PredictedPosition.x - m_Size < -size.x)
         {
-            // Reconciliation for the local ghost
-            m_PlayerGhost.Reconcile(position, serverTick);
+            m_PredictedPosition = new Vector2(-size.x + m_Size, m_PredictedPosition.y);
+        }
+        else if (m_PredictedPosition.x + m_Size > size.x)
+        {
+            m_PredictedPosition = new Vector2(size.x - m_Size, m_PredictedPosition.y);
+        }
+        if (m_PredictedPosition.y + m_Size > size.y)
+        {
+            m_PredictedPosition = new Vector2(m_PredictedPosition.x, size.y - m_Size);
+        }
+        else if (m_PredictedPosition.y - m_Size < -size.y)
+        {
+            m_PredictedPosition = new Vector2(m_PredictedPosition.x, -size.y + m_Size);
+        }
+        m_PredictionHistory[m_TickCounter] = m_PredictedPosition;
+        
+    }
+
+    // Local reconciliation for the owned ghost
+    public void Reconcile(Vector2 serverPosition, int tickCounter)
+    {
+        if (!IsOwner) return;
+
+        if (m_PredictionHistory.TryGetValue(tickCounter, out var predictedPos))
+        {
+            Vector2 error = serverPosition - predictedPos;
+            m_PredictedPosition += error;
+            m_PredictionHistory.Clear();
         }
     }
+    #endregion
 
 }
