@@ -16,10 +16,11 @@ public class Player : NetworkBehaviour
 
     // Local ghost predictions
     public Vector2 m_PredictedPosition;
-    private Dictionary<int, Vector2> m_PredictionHistory = new Dictionary<int, Vector2>();
+    private Dictionary<int, Vector2> m_PredictedPositionHistory = new Dictionary<int, Vector2>();
+    private Dictionary<int, Vector2> m_InputHistory = new Dictionary<int, Vector2>();
 
-    // Managing several inputs pressed together (example: up AND down) 
-    private Queue<KeyValuePair<int, Vector2>> m_InputQueue = new Queue<KeyValuePair<int, Vector2>>();
+    // Queue of the client requests
+    private Queue<KeyValuePair<int, Vector2>> m_RequestQueue = new Queue<KeyValuePair<int, Vector2>>();
 
     // Game data
     private GameState m_GameState;
@@ -51,12 +52,7 @@ public class Player : NetworkBehaviour
         // Server updating player's position and broadcasting it
         if (IsServer)
         {
-            UpdatePositionServer(out int tickCounter);
-
-            if (tickCounter != -1)
-            {
-                BroadcastPositionClientRpc(m_Position.Value, tickCounter);
-            }
+            UpdatePositionServer();
         }
 
         // Client sending its own inputs
@@ -68,15 +64,14 @@ public class Player : NetworkBehaviour
     }
 
     #region Server/Client updates
-    private void UpdatePositionServer(out int tickCounter)
+    private void UpdatePositionServer()
     {
-        tickCounter = -1;
-        // Consuming all inputs and updating server's position
-        if (m_InputQueue.Count > 0)
+        // Consuming the request, updating server position, and sending position to client
+        if (m_RequestQueue.Count > 0)
         {
-            var inputPair = m_InputQueue.Dequeue();
+            var inputPair = m_RequestQueue.Dequeue();
             var input = inputPair.Value;
-            tickCounter = inputPair.Key;
+            int tickCounter = inputPair.Key;
             m_Position.Value += input * m_Velocity * Time.deltaTime;
             var size = GameState.GameSize;
             if (m_Position.Value.x - m_Size < -size.x)
@@ -96,6 +91,9 @@ public class Player : NetworkBehaviour
             {
                 m_Position.Value = new Vector2(m_Position.Value.x, -size.y + m_Size);
             }
+
+            // Sending the position to the client
+            SendPositionClientRpc(m_Position.Value, tickCounter);
         }
     }
 
@@ -123,7 +121,7 @@ public class Player : NetworkBehaviour
         if (inputDirection != Vector2.zero)
         {
             // Prediction for the local ghost
-            PredictMovement(inputDirection, Time.fixedDeltaTime);
+            PredictMovement(inputDirection);
 
             // Sending the inputs to the server
             SendInputServerRpc(inputDirection.normalized, m_TickCounter);
@@ -135,11 +133,11 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     private void SendInputServerRpc(Vector2 input, int tickCounter)
     {
-        m_InputQueue.Enqueue(new KeyValuePair<int, Vector2>(tickCounter, input));
+        m_RequestQueue.Enqueue(new KeyValuePair<int, Vector2>(tickCounter, input));
     }
 
     [ClientRpc]
-    private void BroadcastPositionClientRpc(Vector2 position, int serverTick)
+    private void SendPositionClientRpc(Vector2 position, int serverTick)
     {
         
         Reconcile(position, serverTick);
@@ -148,11 +146,12 @@ public class Player : NetworkBehaviour
 
     #region Prediction/Reconciliation
     // Local prediction for the owned ghost
-    public void PredictMovement(Vector2 direction, float deltaTime)
+    public void PredictMovement(Vector2 direction)
     {
         if (!IsOwner || NetworkManager.Singleton == null) return;
 
         // Updating predicted position
+        float deltaTime = Time.fixedDeltaTime;
         m_PredictedPosition += direction * Velocity * deltaTime;
         var size = GameState.GameSize;
         if (m_PredictedPosition.x - m_Size < -size.x)
@@ -171,8 +170,10 @@ public class Player : NetworkBehaviour
         {
             m_PredictedPosition = new Vector2(m_PredictedPosition.x, -size.y + m_Size);
         }
-        m_PredictionHistory[m_TickCounter] = m_PredictedPosition;
-        
+
+        // Updating history
+        m_InputHistory[m_TickCounter] = direction;
+        m_PredictedPositionHistory[m_TickCounter] = m_PredictedPosition;
     }
 
     // Local reconciliation for the owned ghost
@@ -180,11 +181,59 @@ public class Player : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        if (m_PredictionHistory.TryGetValue(tickCounter, out var predictedPos))
+        // If there was a prediction, checking it and correcting the client's history if necessary
+        if (m_PredictedPositionHistory.TryGetValue(tickCounter, out var predictedPos))
         {
             Vector2 error = serverPosition - predictedPos;
-            m_PredictedPosition += error;
-            m_PredictionHistory.Clear();
+            if (error.sqrMagnitude > 0.001f)
+            {
+                float deltaTime = Time.fixedDeltaTime;
+
+                // Checking which ticks to simulate, and removing older history
+                List<int> keysToSimulate = new List<int>();
+                List<int> keysToRemove = new List<int>();
+                foreach (var key in m_PredictedPositionHistory.Keys)
+                {
+                    if (key >= tickCounter) {
+                        keysToSimulate.Add(key);
+                    }
+                    else
+                    {
+                        keysToRemove.Add(key);
+                    }
+                }
+                foreach (var key in keysToRemove)
+                {
+                    m_PredictedPositionHistory.Remove(key);
+                    m_InputHistory.Remove(key);
+                }
+                keysToSimulate.Sort();
+
+                // Recalculating the whole history
+                m_PredictedPositionHistory[tickCounter] = serverPosition;
+                for (int i = 1; i < keysToSimulate.Count; i++)
+                {
+                    m_PredictedPositionHistory[keysToSimulate[i]] = m_PredictedPositionHistory[keysToSimulate[i - 1]] + m_InputHistory[keysToSimulate[i]] * Velocity * deltaTime * (keysToSimulate[i] - keysToSimulate[i - 1]);
+                    var size = GameState.GameSize;
+                    if (m_PredictedPositionHistory[keysToSimulate[i]].x - m_Size < -size.x)
+                    {
+                        m_PredictedPositionHistory[keysToSimulate[i]] = new Vector2(-size.x + m_Size, m_PredictedPositionHistory[keysToSimulate[i]].y);
+                    }
+                    else if (m_PredictedPositionHistory[keysToSimulate[i]].x + m_Size > size.x)
+                    {
+                        m_PredictedPositionHistory[keysToSimulate[i]] = new Vector2(size.x - m_Size, m_PredictedPositionHistory[keysToSimulate[i]].y);
+                    }
+                    if (m_PredictedPositionHistory[keysToSimulate[i]].y + m_Size > size.y)
+                    {
+                        m_PredictedPositionHistory[keysToSimulate[i]] = new Vector2(m_PredictedPositionHistory[keysToSimulate[i]].x, size.y - m_Size);
+                    }
+                    else if (m_PredictedPositionHistory[keysToSimulate[i]].y - m_Size < -size.y)
+                    {
+                        m_PredictedPositionHistory[keysToSimulate[i]] = new Vector2(m_PredictedPositionHistory[keysToSimulate[i]].x, -size.y + m_Size);
+                    }
+                }
+                m_PredictedPosition = m_PredictedPositionHistory[keysToSimulate[keysToSimulate.Count - 1]];
+            }
         }
     }
     #endregion
