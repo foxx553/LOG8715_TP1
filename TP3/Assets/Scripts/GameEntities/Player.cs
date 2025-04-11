@@ -42,9 +42,20 @@ public class Player : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        
         // No updates if no game data or during a stun
-        if (GameState == null || GameState.IsStunned)
+        /*if (GameState == null || GameState.IsStunned)
+        {
+            return;
+        }*/
+
+        if (IsClient && IsOwner)
+        {
+            if (GameState.m_PredictedIsStunned)
+            {
+                return;
+            }
+        }
+        else if (GameState == null || GameState.IsStunned)
         {
             return;
         }

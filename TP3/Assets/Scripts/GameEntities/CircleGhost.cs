@@ -10,6 +10,15 @@ public class CircleGhost : NetworkBehaviour
 
     private void Update()
     {
-        transform.position = m_MovingCircle.Position;
+        if (IsClient)
+        {
+            transform.position = m_MovingCircle.m_PredictedPosition;
+        }
+        if (IsServer)
+        {
+            transform.position = m_MovingCircle.Position;
+        }
+        
+
     }
 }

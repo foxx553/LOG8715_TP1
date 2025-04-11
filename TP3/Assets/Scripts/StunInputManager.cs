@@ -15,14 +15,16 @@ public class StunInputManager : NetworkBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                m_GameState.PredictedStun();
                 ActivateStunServerRpc();
             }
         }
     }
 
     [ServerRpc (RequireOwnership = false)]
-    private void ActivateStunServerRpc()
+    private void ActivateStunServerRpc(ServerRpcParams rpcParams = default)
     {
-        m_GameState.Stun();
+        ulong stunClientId = rpcParams.Receive.SenderClientId;
+        m_GameState.Stun(stunClientId);
     }
 }

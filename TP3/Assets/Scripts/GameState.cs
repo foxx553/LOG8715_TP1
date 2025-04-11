@@ -22,6 +22,12 @@ public class GameState : NetworkBehaviour
 
     public bool IsStunned { get => m_IsStunned.Value; }
 
+    private NetworkVariable<ulong> m_StunClientId = new NetworkVariable<ulong>();
+
+    public ulong StunClientId { get => m_StunClientId.Value; }
+
+    public bool m_PredictedIsStunned = false;
+
     private Coroutine m_StunCoroutine;
 
     private float m_CurrentRtt;
@@ -33,6 +39,7 @@ public class GameState : NetworkBehaviour
     private void Start()
     {
         m_GameArea.transform.localScale = new Vector3(m_GameSize.x * 2, m_GameSize.y * 2, 1);
+        m_StunClientId.Value = ulong.MaxValue;
     }
 
     private void FixedUpdate()
@@ -67,7 +74,7 @@ public class GameState : NetworkBehaviour
         }
     }
 
-    public void Stun()
+    public void Stun(ulong clientId)
     {
         if (m_StunCoroutine != null)
         {
@@ -75,14 +82,35 @@ public class GameState : NetworkBehaviour
         }
         if (IsServer)
         {
-            m_StunCoroutine = StartCoroutine(StunCoroutine());
+            m_StunCoroutine = StartCoroutine(StunCoroutine(clientId));
         }
     }
 
-    private IEnumerator StunCoroutine()
+    private IEnumerator StunCoroutine(ulong clientId)
     {
+        m_StunClientId.Value = clientId;
         m_IsStunned.Value = true;
         yield return new WaitForSeconds(m_StunDuration);
         m_IsStunned.Value = false;
+        m_StunClientId.Value = ulong.MaxValue;
+    }
+
+    public void PredictedStun()
+    {
+        if (m_StunCoroutine != null)
+        {
+            StopCoroutine(m_StunCoroutine);
+        }
+        if (IsClient)
+        {
+            m_StunCoroutine = StartCoroutine(PredictedStunCoroutine());
+        }
+    }
+
+    private IEnumerator PredictedStunCoroutine()
+    {
+        m_PredictedIsStunned = true;
+        yield return new WaitForSeconds(m_StunDuration);
+        m_PredictedIsStunned = false;
     }
 }
