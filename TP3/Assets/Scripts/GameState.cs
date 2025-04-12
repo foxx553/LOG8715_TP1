@@ -11,7 +11,7 @@ public class GameState : NetworkBehaviour
     private GameObject m_GameArea;
 
     [SerializeField]
-    private float m_StunDuration = 1.0f;
+    private float m_StunDuration = 3.0f;
 
     [SerializeField]
     private Vector2 m_GameSize;

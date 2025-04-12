@@ -48,17 +48,24 @@ public class Player : NetworkBehaviour
             return;
         }*/
 
-        if (IsClient && IsOwner)
+        
+        ulong myClientId = NetworkManager.Singleton.LocalClientId;
+
+        if (GameState == null || GameState.IsStunned)
+        {
+            if (GameState.StunClientId != myClientId)
+            {
+                return;
+            }
+        }
+        else if (IsClient && IsOwner)
         {
             if (GameState.m_PredictedIsStunned)
             {
                 return;
             }
         }
-        else if (GameState == null || GameState.IsStunned)
-        {
-            return;
-        }
+        
 
         // Server updating player's position and broadcasting it
         if (IsServer)
@@ -110,6 +117,7 @@ public class Player : NetworkBehaviour
 
     private void UpdateInputClient()
     {
+
         // Getting the resulting direction
         Vector2 inputDirection = new Vector2(0, 0);
         if (Input.GetKey(KeyCode.W))
