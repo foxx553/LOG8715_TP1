@@ -22,12 +22,6 @@ public class GameState : NetworkBehaviour
 
     public bool IsStunned { get => m_IsStunned.Value; }
 
-    private NetworkVariable<ulong> m_StunClientId = new NetworkVariable<ulong>();
-
-    public ulong StunClientId { get => m_StunClientId.Value; }
-
-    public bool m_PredictedIsStunned = false;
-
     private Coroutine m_StunCoroutine;
 
     private float m_CurrentRtt;
@@ -35,6 +29,11 @@ public class GameState : NetworkBehaviour
     public float CurrentRTT { get => m_CurrentRtt / 1000f; }
 
     public NetworkVariable<float> ServerTime;
+
+    // Local prediction of the stun
+    private NetworkVariable<ulong> m_StunClientId = new NetworkVariable<ulong>();
+    public ulong StunClientId { get => m_StunClientId.Value; }
+    public bool m_PredictedIsStunned = false;
 
     private void Start()
     {
@@ -69,11 +68,11 @@ public class GameState : NetworkBehaviour
     {
         if (!IsServer)
         {
-            // si on est un client, retourner au menu principal
             SceneManager.LoadScene("StartupScene");
         }
     }
 
+    #region Server stun
     public void Stun(ulong clientId)
     {
         if (m_StunCoroutine != null)
@@ -94,7 +93,9 @@ public class GameState : NetworkBehaviour
         m_IsStunned.Value = false;
         m_StunClientId.Value = ulong.MaxValue;
     }
+    #endregion
 
+    #region Predicted stun
     public void PredictedStun()
     {
         if (m_StunCoroutine != null)
@@ -113,4 +114,5 @@ public class GameState : NetworkBehaviour
         yield return new WaitForSeconds(m_StunDuration);
         m_PredictedIsStunned = false;
     }
+    #endregion
 }

@@ -23,6 +23,12 @@ public class MovingCircle : NetworkBehaviour
     // Local ghost predictions
     public Vector2 m_PredictedPosition;
     public Vector2 m_PredictedVelocity;
+    private Dictionary<int, Vector2> m_PredictedPositionHistory = new Dictionary<int, Vector2>();
+    private Dictionary<int, Vector2> m_PredictedVelocityHistory = new Dictionary<int, Vector2>();
+
+    // History counter
+    public int m_TickCounter = 0;
+    public int SERVER_RECONCILIATION_RATE = 500;
 
     private GameState m_GameState;
     #endregion
@@ -48,26 +54,34 @@ public class MovingCircle : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        // Seul le serveur peut mettre a jour la position et la vitesse des cercles.
+        // Server updating its positions
         if (IsServer)
         {
+            if (m_GameState.IsStunned) return;
+
             UpdatePositionServer();
         }
+        // Client updating its predictions
         else
         {
-            UpdatePositionClient();
+            ulong myClientId = NetworkManager.Singleton.LocalClientId;
+            
+            // Applying the immediate stun to the client who triggered it
+            if (m_GameState.m_PredictedIsStunned) return;
+
+            // Applying the server stun for other clients
+            if (m_GameState.IsStunned && m_GameState.StunClientId != myClientId) return;
+
+            m_TickCounter++;
+            PredictMovement();
         }
     }
 
-    #region Server/Client updates
+    #region Server updates
     private void UpdatePositionServer()
     {
-        if (m_GameState.IsStunned) return;
-
-        // Mise a jour de la position du cercle selon sa vitesse
         m_Position.Value += m_Velocity.Value * Time.deltaTime;
 
-        // Gestion des collisions avec l'exterieur de la zone de simulation
         var size = m_GameState.GameSize;
         if (m_Position.Value.x - m_Radius < -size.x)
         {
@@ -91,17 +105,13 @@ public class MovingCircle : NetworkBehaviour
             m_Velocity.Value *= new Vector2(1, -1);
         }
     }
+    #endregion
 
-    private void UpdatePositionClient()
+    #region Client prediction/reconciliation
+    private void PredictMovement()
     {
-        ulong myClientId = NetworkManager.Singleton.LocalClientId;
-        if (m_GameState.m_PredictedIsStunned) return;
-        if (m_GameState.IsStunned && m_GameState.StunClientId != myClientId) return;
-
-        // Mise a jour de la position du cercle selon sa vitesse
         m_PredictedPosition += m_PredictedVelocity * Time.deltaTime;
 
-        // Gestion des collisions avec l'exterieur de la zone de simulation
         var size = m_GameState.GameSize;
         if (m_PredictedPosition.x - m_Radius < -size.x)
         {
@@ -124,6 +134,98 @@ public class MovingCircle : NetworkBehaviour
             m_PredictedPosition = new Vector2(m_PredictedPosition.x, -size.y + m_Radius);
             m_PredictedVelocity *= new Vector2(1, -1);
         }
+
+        m_PredictedPositionHistory[m_TickCounter] = m_PredictedPosition;
+        m_PredictedVelocityHistory[m_TickCounter] = m_PredictedVelocity;
+
+        if (m_TickCounter % SERVER_RECONCILIATION_RATE == 0) SendTickValueServerRpc(m_TickCounter);
+    }
+
+    public void Reconcile(Vector2 serverPosition, Vector2 serverVelocity, int tickCounter)
+    {
+        // If there was a prediction, checking it and correcting the client's history if necessary
+        if (m_PredictedPositionHistory.TryGetValue(tickCounter, out var predictedPosition)
+            && m_PredictedVelocityHistory.TryGetValue(tickCounter, out var predictedVelocity))
+        {
+            Debug.Log("Reconciliation");
+            Vector2 errorPosition = serverPosition - predictedPosition;
+            Vector2 errorVelocity = serverVelocity - predictedVelocity;
+            if (errorPosition.sqrMagnitude > 0.001f || errorVelocity.sqrMagnitude > 0.001f)
+            {
+                // Checking which ticks to simulate, and removing older history
+                List<int> keysToSimulate = new List<int>();
+                List<int> keysToRemove = new List<int>();
+                foreach (var key in m_PredictedPositionHistory.Keys)
+                {
+                    if (key >= tickCounter) {
+                        keysToSimulate.Add(key);
+                    }
+                    else
+                    {
+                        keysToRemove.Add(key);
+                    }
+                }
+                foreach (var key in keysToRemove)
+                {
+                    m_PredictedPositionHistory.Remove(key);
+                    m_PredictedVelocityHistory.Remove(key);
+                }
+                keysToSimulate.Sort();
+
+                // Recalculating the whole history
+                m_PredictedPositionHistory[tickCounter] = serverPosition;
+                m_PredictedVelocityHistory[tickCounter] = serverVelocity;
+                for (int i = 1; i < keysToSimulate.Count; i++)
+                {
+                    m_PredictedPositionHistory[keysToSimulate[i]] = m_PredictedPositionHistory[keysToSimulate[i - 1]] + m_PredictedVelocityHistory[keysToSimulate[i - 1]] * Time.deltaTime;
+                    m_PredictedVelocityHistory[keysToSimulate[i]] = m_PredictedVelocityHistory[keysToSimulate[i - 1]];
+
+                    var size = m_GameState.GameSize;
+                    if (m_PredictedPositionHistory[keysToSimulate[i]].x - m_Radius < -size.x)
+                    {
+                        m_PredictedPositionHistory[keysToSimulate[i]] = new Vector2(-size.x + m_Radius, m_PredictedPositionHistory[keysToSimulate[i]].y);
+                        m_PredictedVelocityHistory[keysToSimulate[i]] *= new Vector2(-1, 1);
+                    }
+                    else if (m_PredictedPositionHistory[keysToSimulate[i]].x + m_Radius > size.x)
+                    {
+                        m_PredictedPositionHistory[keysToSimulate[i]] = new Vector2(size.x - m_Radius, m_PredictedPositionHistory[keysToSimulate[i]].y);
+                        m_PredictedVelocityHistory[keysToSimulate[i]] *= new Vector2(-1, 1);
+                    }
+
+                    if (m_PredictedPositionHistory[keysToSimulate[i]].y + m_Radius > size.y)
+                    {
+                        m_PredictedPositionHistory[keysToSimulate[i]] = new Vector2(m_PredictedPositionHistory[keysToSimulate[i]].x, size.y - m_Radius);
+                        m_PredictedVelocityHistory[keysToSimulate[i]] *= new Vector2(1, -1);
+                    }
+                    else if (m_PredictedPositionHistory[keysToSimulate[i]].y - m_Radius < -size.y)
+                    {
+                        m_PredictedPositionHistory[keysToSimulate[i]] = new Vector2(m_PredictedPositionHistory[keysToSimulate[i]].x, -size.y + m_Radius);
+                        m_PredictedVelocityHistory[keysToSimulate[i]] *= new Vector2(1, -1);
+                    }
+                }
+                m_PredictedPosition = m_PredictedPositionHistory[keysToSimulate[keysToSimulate.Count - 1]];
+                m_PredictedVelocity = m_PredictedVelocityHistory[keysToSimulate[keysToSimulate.Count - 1]];
+            }
+        }
     }
     #endregion
+
+    #region Rpc
+
+    [ServerRpc (RequireOwnership = false)]
+    private void SendTickValueServerRpc(int tickCounter)
+    {
+        // Sync with client by sending immediately back the server calculated position/velocity
+        SendPositionVelocityClientRpc(m_Position.Value, m_Velocity.Value, tickCounter);
+    }
+
+    [ClientRpc]
+    private void SendPositionVelocityClientRpc(Vector2 serverPosition, Vector2 serverVelocity, int tickCounter)
+    {
+        // Reconciliating using server's answer
+        Reconcile(serverPosition, serverVelocity, tickCounter);
+    }
+
+    #endregion
+
 }

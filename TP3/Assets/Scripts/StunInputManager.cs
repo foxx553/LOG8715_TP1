@@ -10,7 +10,6 @@ public class StunInputManager : NetworkBehaviour
 
     private void Update()
     {
-        // Seuls les clients peuvent envoyer des inputs.
         if (IsClient)
         {
             if (Input.GetKeyDown(KeyCode.Space))
@@ -24,6 +23,7 @@ public class StunInputManager : NetworkBehaviour
     [ServerRpc (RequireOwnership = false)]
     private void ActivateStunServerRpc(ServerRpcParams rpcParams = default)
     {
+        // Keeping the ID of the client who triggered the stun
         ulong stunClientId = rpcParams.Receive.SenderClientId;
         m_GameState.Stun(stunClientId);
     }

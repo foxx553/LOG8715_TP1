@@ -41,16 +41,10 @@ public class Player : NetworkBehaviour
     #endregion
 
     private void FixedUpdate()
-    {
-        // No updates if no game data or during a stun
-        /*if (GameState == null || GameState.IsStunned)
-        {
-            return;
-        }*/
-
-        
+    {   
         ulong myClientId = NetworkManager.Singleton.LocalClientId;
 
+        // Applying server stun to everyone except the client who triggered the stun
         if (GameState == null || GameState.IsStunned)
         {
             if (GameState.StunClientId != myClientId)
@@ -58,6 +52,7 @@ public class Player : NetworkBehaviour
                 return;
             }
         }
+        // Applying immediate stun to the client who triggered the stun
         else if (IsClient && IsOwner)
         {
             if (GameState.m_PredictedIsStunned)
@@ -84,7 +79,6 @@ public class Player : NetworkBehaviour
     #region Server/Client updates
     private void UpdatePositionServer()
     {
-        // Consuming the request, updating server position, and sending position to client
         if (m_RequestQueue.Count > 0)
         {
             var inputPair = m_RequestQueue.Dequeue();
@@ -110,15 +104,12 @@ public class Player : NetworkBehaviour
                 m_Position.Value = new Vector2(m_Position.Value.x, -size.y + m_Size);
             }
 
-            // Sending the position to the client
             SendPositionClientRpc(m_Position.Value, tickCounter);
         }
     }
 
     private void UpdateInputClient()
     {
-
-        // Getting the resulting direction
         Vector2 inputDirection = new Vector2(0, 0);
         if (Input.GetKey(KeyCode.W))
         {
@@ -139,10 +130,7 @@ public class Player : NetworkBehaviour
         
         if (inputDirection != Vector2.zero)
         {
-            // Prediction for the local ghost
-            PredictMovement(inputDirection);
-
-            // Sending the inputs to the server
+            PredictMovement(inputDirection.normalized);
             SendInputServerRpc(inputDirection.normalized, m_TickCounter);
         }
     }
@@ -164,12 +152,10 @@ public class Player : NetworkBehaviour
     #endregion
 
     #region Prediction/Reconciliation
-    // Local prediction for the owned ghost
     public void PredictMovement(Vector2 direction)
     {
         if (!IsOwner || NetworkManager.Singleton == null) return;
 
-        // Updating predicted position
         float deltaTime = Time.fixedDeltaTime;
         m_PredictedPosition += direction * Velocity * deltaTime;
         var size = GameState.GameSize;
@@ -190,20 +176,18 @@ public class Player : NetworkBehaviour
             m_PredictedPosition = new Vector2(m_PredictedPosition.x, -size.y + m_Size);
         }
 
-        // Updating history
         m_InputHistory[m_TickCounter] = direction;
         m_PredictedPositionHistory[m_TickCounter] = m_PredictedPosition;
     }
 
-    // Local reconciliation for the owned ghost
     public void Reconcile(Vector2 serverPosition, int tickCounter)
     {
         if (!IsOwner) return;
 
         // If there was a prediction, checking it and correcting the client's history if necessary
-        if (m_PredictedPositionHistory.TryGetValue(tickCounter, out var predictedPos))
+        if (m_PredictedPositionHistory.TryGetValue(tickCounter, out var predictedPosition))
         {
-            Vector2 error = serverPosition - predictedPos;
+            Vector2 error = serverPosition - predictedPosition;
             if (error.sqrMagnitude > 0.001f)
             {
                 float deltaTime = Time.fixedDeltaTime;
